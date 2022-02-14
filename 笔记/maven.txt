@@ -1,0 +1,107 @@
+同pom 后者覆盖前者
+
+不同pom
+	浅者覆盖后者
+	前者覆盖后者
+	
+
+
+作用域
+compile  主和测能用   能打包
+runtime  主和测不能用 能打包
+test     测试能用     不能打包  不传递依赖
+provided 主和测能用   不能打包  不传递依赖
+
+<optional>true</optional> 不传递依赖
+
+
+聚合和继承说2个概念，不要混淆一起
+
+聚合可以方便打包，发布
+<modules>
+	<module>Son</module>
+	<module>Son2</module>
+	<module>../1111/untitled2</module>
+</modules>
+继承，可以方便父级做统一版本管理
+<parent>
+	<artifactId>Father</artifactId>
+	<groupId>org.example</groupId>
+	<version>1.0-SNAPSHOT</version>
+	<relativePath>../../Father/pom.xml</relativePath>
+</parent>
+<dependencyManagement>隐式继承
+<pluginManagement>隐式继承
+
+<dependency> 显式继承
+<plugin>显式继承
+
+
+
+
+<plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-dependency-plugin</artifactId>
+	<executions>
+		<execution>
+			<id>copy-dependencies</id>
+			<!--哪些功能需要在什么生命周期的位置去执行-->
+			<phase>install</phase>
+			<goals>
+				<!--这里是这个插件能做什么功能-->
+				<goal>copy-dependencies</goal>
+			</goals>
+			<configuration>
+				<outputDirectory>${project.build.directory}/lib</outputDirectory>
+			</configuration>
+		</execution>
+	</executions>
+</plugin>
+
+私服搭建
+https://help.sonatype.com/repomanager3/download
+宿主仓库（给自己使用的）
+中央仓库（代理中央仓库用的）
+仓库组（提供下载用）
+
+私服下载，账户密码要对应
+<server>
+  <id>zms-download-authenticate</id>
+  <username>admin</username>
+  <password>123456</password>
+</server>
+<mirror>
+  <id>zms-download-authenticate</id>
+  <mirrorOf>*</mirrorOf>
+  <name>自己搭建的仓库</name>
+  <url>http://127.0.0.1:8081/repository/zms-group-repso/</url>
+</mirror>
+需要发布到什么仓库位置
+<distributionManagement>
+	<repository>
+		<id>zms-authenticate</id>
+		<url>http://127.0.0.1:8081/repository/zms-release-respo/</url>
+	</repository>
+	<snapshotRepository>
+		<id>zms-authenticate</id>
+		<url>http://127.0.0.1:8081/repository/zms-snapshot-respo/</url>
+	</snapshotRepository>
+</distributionManagement>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,92 @@
+openresty
+https://www.bilibili.com/video/BV1tb411j7vr?spm_id_from=333.999.0.0
+
+
+nginx nginx-1.18.0.tar.gz
+	下载
+		http://nginx.org/download/
+	关闭selinux
+		vi /etc/selinux/config  SELINUX=disabled  init 6
+	nginx依赖
+		yum -y install gcc pcre pcre-devel zlib zlib-devel openssl openssl-devel
+		./configure 
+		make && make install
+	命令
+		启动
+			nginx
+			nginx -s stop 强制关闭
+			nginx -s quit 优雅关闭
+			nginx -s reload 重启work进程
+			nginx -s reopen 重新打开日志文件（用于日志迁移）
+		配置文件检查
+			nginx -t
+			nginx -t -c /usr/local/nginx/conf/nginx.conf
+		指定配置文件启动
+			nginx -c /usr/local/nginx/conf/nginx.conf
+			
+		location
+			指定模式【^~】
+				location /abc  匹配路径  /abc  /abcccc /abc/asdas  
+				location ^~/abc  匹配路径  /abc  /abcccc /abc/asdas    [^~] 匹配到就停止往下继续匹配别的location
+			精确匹配【=】
+				location =/abc  匹配路径  /abc
+			正则表达式匹配【~】【~*】
+				location ~^/abc\w$  匹配路径  /abc1  /abcd
+				location ~*^/abc\w$  匹配路径  /ABc1  /Abcd
+    跨域location添加
+      add_header Access-Control-Allow-Origin http://192.168.0.203,http://192.168.0.204;
+      add_header Access-Control-Allow-Methods GET,POST,PUT,DELETE;
+	 
+	内置变量
+		https://www.cnblogs.com/xiaopaipai/p/10522645.html
+	命令
+		break 同一作用域后面的代码无效，并且会执行重定向操作
+		return 整个作用域后面代码无效
+				
+nginx升级或者增加module
+	 1.把相应参数复制下来
+		nginx -V
+	 2.备份之前版本的nginx
+		mv /usr/local/nginx/sbin/nginx  /usr/local/nginx/sbin/nginx.bak
+	 3.清空之前编译过的内容
+		cd /root/nginx-1.18.0
+		make clean
+	 4.重新编译+之前的nginx -V的参数
+		 ./configure --with-http_gzip_static_module
+	    make
+	 5.将二进制文件复制到之前nginx sbin目录
+	   cp /root/nginx-1.18.0/objs/nginx /usr/local/nginx/sbin/
+	 6.执行更新,把老服务关闭，启动新服务
+	   cd /root/nginx-1.18.0
+	   make upgrade
+	
+
+
+module依赖
+       开启zip压缩资源访问 --with-http_gzip_static_module   因为sendfile on 的开启，所以压缩会设置到用户态和内核态的切换以及拷贝。
+	   开启https  --with-http_ssl_module
+
+
+
+	   
+	   
+	   
+	   
+docker run --name some-nginx -d -p 8080:80 some-content-nginx
+docker run --name some-nginx -d -p 8080:80 some-content-nginx
+docker run --name some-nginx -d -p 9991:80 nginx:1.20
+
+./configure --with-http_gzip_static_module --with-http_ssl_module
+
+
+
+
+
+
+
+
+
+
+
+
+				
