@@ -2,6 +2,16 @@ openresty
 https://www.bilibili.com/video/BV1tb411j7vr?spm_id_from=333.999.0.0
 
 
+集群分类
+	LB集群（负载均衡）
+		LVS（Linux Virtual Server）4层协议做负载均衡
+		haproxy（4，7层）
+		nginx（4，7层）
+	HA集群
+		keepalived,heartbeat,pacemaker,piranha
+	HPC集群
+
+
 nginx nginx-1.18.0.tar.gz
 	下载
 		http://nginx.org/download/
@@ -61,30 +71,23 @@ nginx升级或者增加module
 	   make upgrade
 	
 
+	
+	
 
 module依赖
        开启zip压缩资源访问 --with-http_gzip_static_module   因为sendfile on 的开启，所以压缩会设置到用户态和内核态的切换以及拷贝。
 	   开启https  --with-http_ssl_module
 
-
-
+相关参数获取
+	$1 获取正则表达式参数
+	$http_Connection 获取request请求头参数
+	$arg_canshu 获取地址上的参数
+	$cookie_channel 获取cookie参数   
 	   
 	   
+ ./configure --with-http_gzip_static_module --with-http_ssl_module --add-module=/usr/local/nginx/module/nginx-upstream-fair-master	--add-module=/usr/local/nginx/module/ngx_cache_purge-2.3
+
 	   
-	   
-docker run --name some-nginx -d -p 8080:80 some-content-nginx
-docker run --name some-nginx -d -p 8080:80 some-content-nginx
-docker run --name some-nginx -d -p 9991:80 nginx:1.20
-
-./configure --with-http_gzip_static_module --with-http_ssl_module
-
-
-
-
-
-
-
-
 
 
 
