@@ -37,7 +37,8 @@ nacos服务发现和配置管理 https://github.com/alibaba/nacos
 		https://github.com/alibaba/nacos/releases/tag/1.4.1
 	启动命令
 		startup.cmd -m standalone
-		
+	UI
+		http://192.168.109.1:8848/nacos/index.html	
 	集群配置 nginx+nacos+mysql集群
 		1.导入数据表
 			nacos-mysql.sql 
@@ -82,7 +83,75 @@ spring amqp	(advanced message queue protocol)
 		-p 15672:15672 -p 5672:5672 -d rabbitmq:3-management
 	登陆地址
 		http://192.168.0.203:15672/#/users/liqiu
-		
+	
+	rabbitmq 基于内存存储
+		消息可靠性（可靠消息最终一致性）
+			生产者ack
+			消息持久化
+			消费者ack
+			消费失败重试	
+		死信交换机（队列中丢弃的消息直接发送到交换机）
+			如下3种情况会把消息重新发送到死信交换机
+			1.消息TTL超时或者队列TTL超时
+			2.reject或者nack的消息（消费者失败重试）
+			3.消息队列满了	
+		惰性队列（数据直接写磁盘）
+			普通队列（先存内存，在达到阈值时部分数据刷磁盘）
+		MQ集群
+			普通集群（共享交换机和队列的元信息，队列数据不共享）
+				docker安装
+				1.准备.erlang.cookie文件
+					docker exec -it rmq cat /var/lib/rabbitmq/.erlang.cookie
+					FNZAQOJSDCFWBNNXYJVC
+					echo "FNZAQOJSDCFWBNNXYJVC" > .erlang.cookie 
+					chmod 600 rabbitdir1/.erlang.cookie
+				2.准备rabbitmq.conf文件
+					vim rabbitmq.conf
+					loopback_users.guest = false
+					listeners.tcp.default = 5672
+					cluster_formation.peer_discovery_backend = rabbit_peer_discovery_classic_config
+					cluster_formation.classic_config.nodes.1 = rabbit@rmq1
+					cluster_formation.classic_config.nodes.2 = rabbit@rmq2
+					cluster_formation.classic_config.nodes.3 = rabbit@rmq3
+				3.拷贝文件
+					cp .erlang.cookie rabbitmq.conf rabbitdir1/
+					cp .erlang.cookie rabbitmq.conf rabbitdir2/
+					cp .erlang.cookie rabbitmq.conf rabbitdir3/
+				4.创建docker网络
+					docker network create rmq-net
+				5.启动	
+					docker run -d --net rmq-net \
+					-v ${PWD}/rabbitdir1/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf \
+					-v ${PWD}/rabbitdir1/.erlang.cookie:/var/lib//rabbitmq/.erlang.cookie \
+					-e RABBITMQ_DEFAULT_USER = liyaqiu \
+					-e RABBITMQ_DEFAULT_PASS = 123456 \
+					--name rmq1 --hostname rmq1 -p 5672:5672 -p 15672:15672 rabbitmq:3.8.27-management
+					
+					docker run -d --net rmq-net \
+					-v ${PWD}/rabbitdir1/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf \
+					-v ${PWD}/rabbitdir1/.erlang.cookie:/var/lib//rabbitmq/.erlang.cookie \
+					-e RABBITMQ_DEFAULT_USER = liyaqiu \
+					-e RABBITMQ_DEFAULT_PASS = 123456 \
+					--name rmq1 --hostname rmq1 -p 5673:5672 -p 15673:15672 rabbitmq:3.8.27-management
+					
+					docker run -d --net rmq-net \
+					-v ${PWD}/rabbitdir1/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf \
+					-v ${PWD}/rabbitdir1/.erlang.cookie:/var/lib//rabbitmq/.erlang.cookie \
+					-e RABBITMQ_DEFAULT_USER = liyaqiu \
+					-e RABBITMQ_DEFAULT_PASS = 123456 \
+					--name rmq1 --hostname rmq1 -p 5674:5672 -p 15674:15672 rabbitmq:3.8.27-management	
+			镜像集群（在普通集群的基础上，添加主从备份功能，提供集群的数据可用性，数据同步弱一致性）
+				exactly模式
+					docker exec -it rmq1 bash
+					rabbitmqctl set_policy ha-two "^two\." '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+				all模式（同步到所有节点）
+					docker exec -it rmq1 bash
+					rabbitmqctl set_policy ha-all "^all\." '{"ha-mode":"all"}'
+				nodes模式（同步到指定点模式）
+					docker exec -it rmq1 bash
+					rabbitmqctl set_policy ha-nodes "^nodes\." '{"ha-mode":"nodes","ha-params":["rabbit@rmq2","rabbit@rmq3"]}'
+			仲裁队列（3.8以后版本，跟镜像集群功能一样，但是确保数据同步强一致性）
+	
 		
 elasticsearch
 		docker run -d --name elasticsearch --net somenetwork -p 9200:9200 -p 9300:9300 -v config:/usr/share/elasticsearch/config -v data:/usr/share/elasticsearch/data -v plugins:/usr/share/elasticsearch/plugins -e "ES_JAVA_OPTS=-Xms512m -Xmx512m"  -e "discovery.type=single-node" elasticsearch:7.12.1
@@ -102,13 +171,23 @@ sentinel 微服务保护
 			https://github.com/alibaba/Sentinel/releases/tag/1.8.1
 		雪崩问题（因一个服务的故障导致整个链路的其他服务产生故障）
 			1.流量控制
+				（QPS）
+				热点参数限流（令牌桶算法）
+				排队模式（漏桶算法）
+				默认限流（滑动窗口算法）
 			2.线程隔离
+				（线程数）
+				sentinel使用的是信号量隔离
 			3.降级熔断
 				熔断策略
 					慢调用
 					异常比例
 					异常数
 			4.超时处理
+		启动
+			java -jar -Dnacos.addr=localhost:8080 sentinel-dashboard.jar
+		访问UI
+			http://192.168.0.110:8080/#/dashboard
 		配置持久化
 			https://blog.csdn.net/qq_40592377/article/details/108895824
 			利用sentinel-dashboard推送到nacos,服务在从nacos获取下来
@@ -205,7 +284,7 @@ radis
 		cd redis-6.2.6
 		make && make install
 	服务器启动 redis-server  /conf/redis.conf
-	客户端连接 redis-cli -h 130.120.0.203 -p 6379
+	客户端连接 redis-cli -h 192.168.0.203 -p 6379
 	
 	持久化 redis.conf文件
 		RDB （文件体积小）内存快照，利用fork异步备份一份新的文件，存在数据丢失
@@ -281,7 +360,7 @@ radis
 			dir /temp/data/
 			bind 192.168.0.101-106
 			daemonize yes 开启后台运行
-			replica-announce-ip 192.168.0.101-106 （ip声明）
+			replica-announce-ip 192.168.0.101-106 （声明ip地址）
 			protected-mode no 保护模式(用户密码校验是否开启)
 			databases 1 数据库数量
 			logfile /tmp/data/run.log
@@ -319,25 +398,45 @@ radis
 			3.执行 cluster failover
                  
 多级缓存
+	思路（利用nginx代理到业务服务器openresty，openresty先从redis获取数据，获取不到在去tomcat获取）
 	caffeine本地缓存类似于guava
+		官方文档
+			https://github.com/ben-manes/caffeine/wiki/Cleanup-zh-CN
 	docker run -p 3306:3306 --name mysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged -d mysql:5.7.25		
 	OpenResty	
-		安装
-			yum -y install pcre-devel openssl-devel gcc --skip-broken
-			yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
-			yum -y install yum-utils(报错的情况下执行)
-			yum -y install openresty
-			yum -y install openresty-opm
-		启动OpenResty
-			添加环境变量
-				export PATH=$PATH:/usr/local/openresty/nginx/sbin
-			命令
-				启动 nginx
-				停止 nginx -s stop
-				加载配置 nginx -s reload
+	
+缓存同步
+	1.设置缓存过期时间
+	2.同步更新
+	3.异步更新
+		利用 alibaba canal监听mysql binlog，然后把更新请求发送到需要更新的服务
+		3.1开启mysql binlog
+			vim  /root/mysql5.7.25/conf/my.cnf 
+			[mysqld]
+			skip-name-resolve
+			character_set_server=utf8
+			datadir=/var/lib/mysql
+			server-id=1000
+			#binlog log
+			log-bin=/var/lib/mysql/mysqlbin
+			binlog-do-db=nginx_mysql
+		3.2 查看主节点binlog状态
+			show master status;
+		3.3 创建docker网络
+			docker network create huancun
+			docker network connect huancun 52c2fb10b3c0
+		3.4 添加mysql用户
+			create user canal@'%' identified by 'canal' ;
+			设置从节点权限
+			grant select,replication slave,replication client,super on *.* to 'canal' @'%' identified by 'canal' ;
+			flush privileges;
+		3.5安装canal https://github.com/alibaba/canal/wiki/Docker-QuickStart
+			docker pull canal/canal-server:v1.1.5
+			docker run -p 11111:11111 --name canal -e canal.destinations=test -e canal.instance.master.address=mysql:3306  -e canal.instance.dbUsername=canal  -e canal.instance.dbPassword=canal -e canal.instance.connectionCharset=UTF-8  -e canal.instance.tsdb.enable=true -e canal.instance.gtidon=false  -e canal.instance.filter.regex=nginx_mysql\\..*  --network huancun -d canal/canal-server:v1.1.5
+	
+		3.6 第三方的canal client  https://github.com/NormanGyllenhaal/canal-client  后面可以继续研究官方api
 
-
-https://www.bilibili.com/video/BV1LQ4y127n4?p=156&spm_id_from=pageDriver   14分钟				
+		
 		
 		
 		

@@ -1,7 +1,3 @@
-openresty
-https://www.bilibili.com/video/BV1tb411j7vr?spm_id_from=333.999.0.0
-
-
 集群分类
 	LB集群（负载均衡）
 		LVS（Linux Virtual Server）4层协议做负载均衡
@@ -83,7 +79,68 @@ module依赖
 	$http_Connection 获取request请求头参数
 	$arg_canshu 获取地址上的参数
 	$cookie_channel 获取cookie参数   
-	   
+
+
+
+
+lua-5.4.4.tar.gz
+	官方下载
+		https://www.lua.org/download.html
+	安装
+		cd lua-5.4.4
+		make linux test
+		make install
+		lua -v
+		如果安装失败，缺少libreadline-dev包  yum -y install readline-devel
+
+
+
+
+OpenResty(lua+nginx)  http://openresty.org/cn/download.html  不需要单独安装lua
+	yum安装
+		yum -y install pcre-devel openssl-devel gcc --skip-broken
+		yum-config-manager --add-repo https://openresty.org/package/centos/openresty.repo
+		yum -y install yum-utils(报错的情况下执行)
+		yum -y install openresty
+		yum -y install openresty-opm
+	启动OpenResty
+		添加环境变量
+			export PATH=$PATH:/usr/local/openresty/nginx/sbin
+		命令
+			启动 nginx
+			停止 nginx -s stop
+			加载配置 nginx -s reload
+
+	
+	编译安装
+		下载源码包
+			https://openresty.org/download/openresty-1.19.3.2.tar.gz
+		tar -zxvf openresty-1.19.3.2.tar.gz
+		cd openresty-1.19.3.2
+		./configure
+		make && make install
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 	   
  ./configure --with-http_gzip_static_module --with-http_ssl_module --add-module=/usr/local/nginx/module/nginx-upstream-fair-master	--add-module=/usr/local/nginx/module/ngx_cache_purge-2.3
 

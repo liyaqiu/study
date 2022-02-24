@@ -6,7 +6,7 @@ https://www.cnblogs.com/kevingrace/p/7205846.html
 https://www.cnblogs.com/kevingrace/p/12433503.html
 
 
-redis mogdb 
+redis mogdb  memcached
 
 rocketmq https://www.bilibili.com/video/BV1L4411y7mn?from=search&seid=3090188336145775345&spm_id_from=333.337.0.0
  学完springboot回头学保存一分部
