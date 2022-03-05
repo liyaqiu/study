@@ -70,13 +70,14 @@ ALTER TABLE my_db.test3
   ADD INDEX haha_index (id);	
 
 https://blog.csdn.net/xts5701046/article/details/81395958
-事务(把多个操作看做一个执行单元)
+事务isolation(把多个操作看做一个执行单元)
 	原子性
 	一致性
-	隔离性
-		读未提交 脏数据,不可重复度,幻读
-		读已提交        不可重复度,幻读
-		可重复度                   幻读
+	隔离性（根据隔离的不同，CURD都需要用到事务，每个connection建立的session都会用到事务，只不过默认是自动提交）
+		   (如果你的事务隔离级别设置为读未提交，那么你的session会读到脏数据)
+		读未提交  脏读,不可重复读,幻读
+		读已提交       不可重复读,幻读
+		可重复读                  幻读
 		串行化
 	持久性
 														   	
