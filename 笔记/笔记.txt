@@ -1,12 +1,13 @@
 redis 
 mongodb   https://www.bilibili.com/video/BV1bJ411x7mq?spm_id_from=333.999.0.0
-memcached
+memcached 缓存
 rocketmq  https://www.bilibili.com/video/BV1L4411y7mn?from=search&seid=3090188336145775345&spm_id_from=333.337.0.0
 atcivemq https://www.bilibili.com/video/BV1vJ41177j1?spm_id_from=333.999.0.0
 rabbitmq
 double
 curator
 vue
+postman
 jndi
 webflux https://www.bilibili.com/video/av203182483?from=search&seid=8118518497432004823&spm_id_from=333.337.0.0
 
@@ -23,8 +24,7 @@ jenkins
 
 
 
-spring 
 
-spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=69&spm_id_from=pageDriver   9分钟
+spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=69&spm_id_from=pageDriver   还有后续的原理篇，以及番外篇
 Spring Data https://www.bilibili.com/video/BV1RE41167Pk?spm_id_from=333.999.0.0
 spring权限学习  https://www.bilibili.com/video/BV1tw411f79E 

@@ -6,6 +6,17 @@ log4j   logger有level appender无level                      layout
 logback logger有level appender有level（固定输出）          encoder
 log4j2  logger有level appender有level （范围输出，灵活性） layout
 
+
+jul-slf4j
+	class org.slf4j.impl.JDK14LoggerAdapter
+log4j-slf4j
+	class org.slf4j.impl.Log4jLoggerAdapter	
+logback-slf4j
+	class ch.qos.logback.classic.Logger
+log4j2-slf4j
+	class org.apache.logging.slf4j.Log4jLogger
+	
+
 门面技术获取logger对象
 jcl org.apache.commons.logging.LogFactory.getLog();
 slf4j org.slf4j.LoggerFactory.getLogger();
@@ -16,8 +27,8 @@ log4j(实现技术)log4j.properties
 jul(实现技术) logging.properties
 jcl(门面技术)
 logback(实现技术)logback.xml
-log4j2(实现技术)log4j2.xml
-slf4j(门面技术)如果出现多个日志实现，默认会用第一个
+log4j2(门面技术,实现技术)log4j2.xml
+slf4j(门面技术,实现技术)如果出现多个日志实现，默认会用第一个
 
 
 一下几种常用的日志组合
