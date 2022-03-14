@@ -1,3 +1,7 @@
+springboot配置文件加载顺序
+	https://docs.spring.io/spring-boot/docs/2.5.10/reference/html/features.html#features.external-config
+	
+
 spring核心
 	ioc(控制反转) 将对象交给容器管理
 	di（依赖注入）在容器内进行对象与对象之间的依赖注入
@@ -30,3 +34,16 @@ spring事务
 					nested
 			3.TransactionStatus (事务的运行状态)
 	声明式事务(spring xml配置以及注解配置)
+
+	
+cache
+	spring cache (一级缓存)
+	jetcache (二级缓存)
+	j2cache (二级缓存)
+	
+异步消息传递技术
+	JMS  java message service (基于java的api规范)
+	AMQP Advanced message queue protocol 高级消息队列协议
+	MQTT 物联网
+
+	
