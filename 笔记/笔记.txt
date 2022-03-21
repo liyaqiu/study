@@ -10,9 +10,29 @@ vue
 postman
 jndi
 websocket
+Zabbix 
 webflux https://www.bilibili.com/video/av203182483?from=search&seid=8118518497432004823&spm_id_from=333.337.0.0
+jmeter
+
 
 脑裂问题学习 https://www.cnblogs.com/kevingrace/p/12433503.html https://www.cnblogs.com/kevingrace/p/7205846.html
+
+jenkins
+电商系统学习
+
+
+sso单点登录
+统一认证
+
+
+
+shiro https://www.bilibili.com/video/BV1j54y1t7jM?spm_id_from=333.337.search-card.all.click
+spring security   https://www.bilibili.com/video/BV15a411A7kP?p=11&spm_id_from=pageDriver
+
+https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
+
+
+
 docker 
 https://www.bilibili.com/video/av765404319?from=search&seid=4204671588307049791&spm_id_from=333.337.0.0 
 https://www.bilibili.com/video/BV1gr4y1U7CY?p=66 
@@ -20,12 +40,11 @@ k8s
 	https://www.bilibili.com/video/BV1gr4y1U7CY?p=66 
 	https://www.bilibili.com/video/av245141112?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
 	https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
-jenkins
-电商系统学习
 
 
-
-
-spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=69&spm_id_from=pageDriver   还有后续的原理篇，以及番外篇
-Spring Data https://www.bilibili.com/video/BV1RE41167Pk?spm_id_from=333.999.0.0
+		
+		
+		
+spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
+Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver  最后在学
 spring权限学习  https://www.bilibili.com/video/BV1tw411f79E 
