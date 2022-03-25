@@ -27,24 +27,24 @@ sso单点登录
 
 
 shiro https://www.bilibili.com/video/BV1j54y1t7jM?spm_id_from=333.337.search-card.all.click
-spring security   https://www.bilibili.com/video/BV15a411A7kP?p=11&spm_id_from=pageDriver
+spring security  https://www.bilibili.com/video/BV15a411A7kP?p=35&spm_id_from=pageDriver
 
 https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-docker 
-https://www.bilibili.com/video/av765404319?from=search&seid=4204671588307049791&spm_id_from=333.337.0.0 
-https://www.bilibili.com/video/BV1gr4y1U7CY?p=66 
+docker   https://www.bilibili.com/video/BV1gr4y1U7CY?p=1
+
+
+
 k8s 
-	https://www.bilibili.com/video/BV1gr4y1U7CY?p=66 
 	https://www.bilibili.com/video/av245141112?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
 	https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
-
 
 		
 		
 		
 spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
 Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver  最后在学
-spring权限学习  https://www.bilibili.com/video/BV1tw411f79E 
+spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
+                https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
