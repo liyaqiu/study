@@ -13,6 +13,7 @@ websocket
 Zabbix 
 webflux https://www.bilibili.com/video/av203182483?from=search&seid=8118518497432004823&spm_id_from=333.337.0.0
 jmeter
+idea使用git
 
 
 脑裂问题学习 https://www.cnblogs.com/kevingrace/p/12433503.html https://www.cnblogs.com/kevingrace/p/7205846.html
@@ -33,7 +34,7 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-docker   https://www.bilibili.com/video/BV1gr4y1U7CY?p=1
+docker   https://www.bilibili.com/video/BV1gr4y1U7CY?p=23
 
 
 

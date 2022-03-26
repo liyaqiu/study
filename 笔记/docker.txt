@@ -1,0 +1,141 @@
+docker安装
+	卸载久版本
+		yum remove docker \
+				  docker-client \
+				  docker-client-latest \
+				  docker-common \
+				  docker-latest \
+				  docker-latest-logrotate \
+				  docker-logrotate \
+				  docker-engine
+    阿里云安装				  
+		https://developer.aliyun.com/article/773368?spm=a2c6h.13813017.content3.1.68d11b25RD3rwp
+		https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
+	安装  		
+		yum -y install gcc gcc-c++							
+		yum install -y yum-utils device-mapper-persistent-data lvm2
+		yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+		yum makecache fast
+		安装最新版本
+			yum -y install docker-ce docker-ce-cli containerd.io
+		手动指定版本
+			yum list docker-ce --showduplicates | sort -r
+				docker-ce.x86_64            3:20.10.9-3.el7                     docker-ce-stable
+				docker-ce.x86_64            3:20.10.8-3.el7                     docker-ce-stable
+				docker-ce.x86_64            3:20.10.7-3.el7                     docker-ce-stable
+				docker-ce.x86_64            3:20.10.6-3.el7                     docker-ce-stable
+				docker-ce.x86_64            3:20.10.5-3.el7                     docker-ce-stable
+				docker-ce.x86_64            3:20.10.4-3.el7                     docker-ce-stable
+				
+				取:{20.10.9}-
+			yum -y install docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
+        启动
+			systemctl start docker
+        添加阿里云的镜像下载地址					
+			mkdir -p /etc/docker
+			tee /etc/docker/daemon.json <<-'EOF'
+			{
+			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"]
+			}
+			EOF
+			systemctl daemon-reload
+			systemctl restart docker
+		运行 docker run --name nginx-test -p 8080:80 -d nginx
+	卸载
+		yum remove docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
+		rm -rf /var/lib/docker
+		rm -rf /var/lib/containerd
+		
+		
+		
+命令
+	启动类命令
+		docker --help  
+		docker 命令 --help
+		docker info 查看总览信息
+		
+		systemctl start docker 启动
+		systemctl restart docker 重启
+		systemctl status docker 查看状态
+		
+		systemctl enable docker 开机启动
+		
+	镜像命令
+		docker search nginx 查找镜像
+		
+		docker images 列出所有镜像
+		docker images -qa 紧显示镜像IDs
+		docker images nginx:1.*  查找部分相关版本
+		
+		docker history  605c77e624dd  查看镜像构建信息
+		docker system df 查看镜像/容器/数据卷的占用情况 
+		
+		docker rmi 605c77e624dd 删除
+		docker rmi -f 605c77e624dd 强制删除镜像
+		docker rmi -f $(docker images -qa) 强制删除所有镜像
+		docker rmi -f $(docker images nginx:v* -qa) 强制删除部分镜像
+		docker images nginx:v* -qa | xargs docker rmi -f 强制删除部分镜像
+		
+		docker images -qf dangling=true  查看所有虚悬镜像ids
+		docker rmi -f $(docker images -qf dangling=true) 删除所有虚悬镜像
+		docker rmi -f 
+		
+		docker pull nginx:latest
+		
+		
+		docker login eric
+		docker tag zms:v1 www.eric.com:1234/zms:v1
+		docker push www.eric.com:1234/zms:v1  推送到私有仓库
+		
+		docker save -o ./zms_v1.tar zms:v1  保存镜像文件到本地
+		docker load -i ./zms_v1.tar 加载镜像到docker
+		
+	容器命令
+		docker run -it ba6acccedd29 /bin/bash (默认执行bash)
+		docker run -it --rm ba6acccedd29 /bin/bash 退出后删除容器
+		
+		
+		docker attach 继续使用以前的终端,exit或者Ctrl+c退出容器会停止（正确退出方式Ctrl+p+q）
+		docker exec  重新打开一个终端,exit或者Ctrl+c退出容器不会停止
+		
+		docker attach ce39f4a4d6f4  
+		docker exec -it 38cb4ef91f5e /bin/bash (默认执行bash)  
+		docker exec  38cb4ef91f5e touch 123.txt
+		docker exec  38cb4ef91f5e sh my.sh
+		
+		docker start ba6acccedd29 启动容器
+		docker restart ba6acccedd29 重新启动容器
+		docker stop ba6acccedd29 停止容器
+		docker kill ba6acccedd29 强制停止容器
+		docker pause ba6acccedd29 挂起容器
+		docker unpause ba6acccedd29 取消挂起容器
+
+		docker rm 38cb4ef91f5e 删除容器
+		docker rm -f 38cb4ef91f5e 强制删除单个容器
+		docker rm -f $(docker ps -aq) 强制删除全部容器
+		docker ps -aq | xargs docker rm -f 强制删除全部容器
+			
+		docker cp localdir 38cb4ef91f5e:/dir 拷贝本地目录到容器
+		docker cp localfile 38cb4ef91f5e:/file 拷贝本地文件到容器
+		docker cp 38cb4ef91f5e:/dir  localdir	拷贝容器目录到本地
+		docker cp 38cb4ef91f5e:/file localfile 拷贝容器文件到本地
+		
+		docker run --name testName -d -P nginx:v3  结合EXPOSE 8080 8081 8082   随机端口:8080 随机端口:8081 随机端口:8082
+		docker run --name testName -d -p 8080:80 -p 8081:81 -p 8082:82  nginx:v3  
+		
+		docker run --name testName -d -p 8080:80 -v /local/dirName:/container/dirName -v /local/fileName:/container/fileName  nginx:v3  挂载本地默认或者文件
+		docker run --name testName -d -p 8080:80 -v volumeDirName:/container/dirName  nginx:v3   挂载数据卷
+		 
+		docker ps  | grep nginx 筛选部分容器
+		
+		docker logs --tail=2 -f  839ee565e46b  查看容器日志
+
+		docker inspect 38cb4ef91f5e 查看容器所有信息
+		
+		docker top 38cb4ef91f5e 查看容器进程
+		
+		docker export 7173465f1b40 > ./zms.tar  导出容器
+		cat ./zms.tar | docker import - zms:v1(仓库地址/镜像名:版本号) 
+		
+		docker diff 0d31bb58d1d9  查看容器目录文件变化情况
+		docker wait 0d31bb58d1d9  监听容器退出的状态码
