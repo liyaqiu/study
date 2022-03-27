@@ -8,7 +8,7 @@ docker安装
 				  docker-latest-logrotate \
 				  docker-logrotate \
 				  docker-engine
-    阿里云安装				  
+    阿里云安装docker				  
 		https://developer.aliyun.com/article/773368?spm=a2c6h.13813017.content3.1.68d11b25RD3rwp
 		https://cr.console.aliyun.com/cn-hangzhou/instances/mirrors
 	安装  		
@@ -31,15 +31,14 @@ docker安装
 			yum -y install docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
         启动
 			systemctl start docker
-        添加阿里云的镜像下载地址					
+        添加阿里云加速器					
 			mkdir -p /etc/docker
 			tee /etc/docker/daemon.json <<-'EOF'
 			{
 			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"]
 			}
 			EOF
-			systemctl daemon-reload
-			systemctl restart docker
+			systemctl daemon-reload && systemctl restart docker 
 		运行 docker run --name nginx-test -p 8080:80 -d nginx
 	卸载
 		yum remove docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
@@ -49,6 +48,13 @@ docker安装
 		
 		
 命令
+	登录
+		登录dockerhub仓库
+			docker login --username=18813664703
+			docker logout 
+		登录第三方仓库	
+			docker login --username=tb2603639_11 registry.cn-hangzhou.aliyuncs.com 
+			docker logout registry.cn-hangzhou.aliyuncs.com 
 	启动类命令
 		docker --help  
 		docker 命令 --help
@@ -77,8 +83,8 @@ docker安装
 		docker images nginx:v* -qa | xargs docker rmi -f 强制删除部分镜像
 		
 		docker images -qf dangling=true  查看所有虚悬镜像ids
-		docker rmi -f $(docker images -qf dangling=true) 删除所有虚悬镜像
-		docker rmi -f 
+		docker rmi -f $(docker images -qf dangling=true) 强制删除所有虚悬镜像
+		docker images -qf dangling=true | xargs docker rmi -f 强制删除所有虚悬镜像
 		
 		docker pull nginx:latest
 		
@@ -90,10 +96,9 @@ docker安装
 		docker save -o ./zms_v1.tar zms:v1  保存镜像文件到本地
 		docker load -i ./zms_v1.tar 加载镜像到docker
 		
-	容器命令
+	容器命令		
 		docker run -it ba6acccedd29 /bin/bash (默认执行bash)
 		docker run -it --rm ba6acccedd29 /bin/bash 退出后删除容器
-		
 		
 		docker attach 继续使用以前的终端,exit或者Ctrl+c退出容器会停止（正确退出方式Ctrl+p+q）
 		docker exec  重新打开一个终端,exit或者Ctrl+c退出容器不会停止
@@ -120,11 +125,29 @@ docker安装
 		docker cp 38cb4ef91f5e:/dir  localdir	拷贝容器目录到本地
 		docker cp 38cb4ef91f5e:/file localfile 拷贝容器文件到本地
 		
-		docker run --name testName -d -P nginx:v3  结合EXPOSE 8080 8081 8082   随机端口:8080 随机端口:8081 随机端口:8082
-		docker run --name testName -d -p 8080:80 -p 8081:81 -p 8082:82  nginx:v3  
-		
-		docker run --name testName -d -p 8080:80 -v /local/dirName:/container/dirName -v /local/fileName:/container/fileName  nginx:v3  挂载本地默认或者文件
-		docker run --name testName -d -p 8080:80 -v volumeDirName:/container/dirName  nginx:v3   挂载数据卷
+		端口映射
+			docker run --name testName -d -P nginx:v3  结合EXPOSE 8080 8081 8082   随机端口:8080 随机端口:8081 随机端口:8082
+			docker run --name testName -d -p 8080:80 -p 8081:81 -p 8082:82  nginx:v3  
+		数据卷,如果权限不足用（--privileged=true）
+			默认数据卷
+				docker volume ls  查看数据卷
+				docker volume create juan1 创建数据卷
+				docker volume rm juan1	删除单个数据卷
+				docker volume prune  删除未使用的数据卷
+				docker volume inspect juan1 查看数据卷的具体位置
+			数据卷挂载
+				方式1
+					docker run --name testName -d -p 8080:80 -v /local/dirName:/container/dirName -v /local/fileName:/container/fileName  nginx:v3 
+				方式2
+					docker run --name testName -d -p 8080:80 -v volumeDirName:/container/dirName  nginx:v3   
+			数据卷继承（好处就是不用知道对方挂载多少个目录，以及具体位置，就算被继承u1 u2 挂了也没影响u3，只是继承了mounts规则）
+				docker run -it --name u1 -v /root/data:/data  -v /root/data1:/data1 ba6acccedd29
+				docker run -it --name u2 -v /root/data2:/data2  -v /root/data3:/data3 ba6acccedd29
+				docker run -it --name u3 --volumes-from u1 --volumes-from u2 ba6acccedd29 
+		 
+		 docker run -it --name u1 -v juan1:/data   ba6acccedd29
+		 docker run -it --name u3 --volumes-from u1 --volumes-from u2 ba6acccedd29 
+		 
 		 
 		docker ps  | grep nginx 筛选部分容器
 		
@@ -134,8 +157,63 @@ docker安装
 		
 		docker top 38cb4ef91f5e 查看容器进程
 		
-		docker export 7173465f1b40 > ./zms.tar  导出容器
-		cat ./zms.tar | docker import - zms:v1(仓库地址/镜像名:版本号) 
-		
+		镜像重构
+			方式1
+				docker export 7173465f1b40 > ./zms.tar  导出容器
+				cat ./zms.tar | docker import - zms:v1(仓库地址/镜像名:版本号) 
+			方式2
+				docker commit -m="添加了vim工具" -a="eric" 38cb4ef91f5e zms:v1(仓库地址/镜像名:版本号) 
+			方式3 
+				Dockerfile
+				
 		docker diff 0d31bb58d1d9  查看容器目录文件变化情况
-		docker wait 0d31bb58d1d9  监听容器退出的状态码
+		docker wait 0d31bb58d1d9  监听容器退出的状态码	
+		
+		
+概念
+	联合文件系统UnionFIleSystem，采用了分层方式生成一个操作系统
+	容器
+		bootfs层
+			linux内核(用户权限，进程空间，用户空间，网络空间....)
+		rootfs层
+			Contos-rootfs，Ubuntu-rootfs，Redhat-rootfs
+			rootfs准备了不同版本的根文件系统标准的文件(/dev./proc./bin,/etc .....)
+		用户自定义层
+			application
+	
+dockerhub私服
+	server
+		下载
+			docker pull registry
+		配置
+			mkdir -p /etc/docker
+			tee /etc/docker/daemon.json <<-'EOF'
+			{
+			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
+			  "insecure-registries": ["192.168.88.19:5000"]
+			}
+			EOF
+			systemctl daemon-reload
+			systemctl restart docker   
+		运行私服容器	
+			docker run -d -p 5000:5000 --restart always -v /root/registrydir:/var/lib/registry --privileged=true --name registry registry:latest			
+	client	
+		配置
+			mkdir -p /etc/docker
+			tee /etc/docker/daemon.json <-'EOF'
+			{
+			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
+			  "insecure-registries": ["192.168.88.19:5000,192.168.88.19:6000"]
+			}
+			EOF
+			systemctl daemon-reload && systemctl restart docker 
+		查看仓库
+			curl -XGET http://192.168.88.19:5000/v2/_catalog	
+			
+		推送
+			docker tag 50fe74b50e0d 192.168.88.19:5000/myspace/myubuntu:v2	
+			docker push 192.168.88.19:5000/myspace/myubuntu:v2	
+		拉取
+			docker pull 192.168.88.19:5000/myspace/myubuntu:v2	
+			
+docker run -it --name u1 -v /root/data:/data  ba6acccedd29
