@@ -14,9 +14,11 @@ Zabbix
 webflux https://www.bilibili.com/video/av203182483?from=search&seid=8118518497432004823&spm_id_from=333.337.0.0
 jmeter
 idea使用git
-
+分布式系统遵守的cap原则https://www.ruanyifeng.com/blog/2018/07/cap.html
 
 脑裂问题学习 https://www.cnblogs.com/kevingrace/p/12433503.html https://www.cnblogs.com/kevingrace/p/7205846.html
+
+SpringBoot项目下的mvnw与mvnw.cmd  https://blog.csdn.net/weixin_41917449/article/details/81867018
 
 jenkins
 电商系统学习
@@ -34,7 +36,7 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-docker   https://www.bilibili.com/video/BV1gr4y1U7CY?p=34&spm_id_from=pageDriver
+docker  https://www.bilibili.com/video/BV1gr4y1U7CY?p=80&spm_id_from=pageDriver
 
 
 
@@ -42,8 +44,11 @@ k8s
 	https://www.bilibili.com/video/av245141112?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
 	https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
 
+	
+	
+	
 		
-		
+jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113		
 		
 spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
 Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver  最后在学

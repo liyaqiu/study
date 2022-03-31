@@ -295,17 +295,23 @@ radis
 	客户端连接 redis-cli -h 192.168.0.203 -p 6379
 	
 	持久化 redis.conf文件
-		RDB （文件体积小）内存快照，利用fork异步备份一份新的文件，存在数据丢失
+		RDB全量保存 （文件体积小）内存快照，利用fork异步备份一份新的文件，存在数据丢失
 			save "" #禁用rdb
 			save 300 5 #300秒内有5个key被修改将触发持久化
 			dir /root/temp 修改保存数据的位置
-		AOF （文件体积大）追加命令到文件
+		AOF增量保存 （文件体积大）追加命令到文件
 			appendonly  yes 启用AOF
 			appendfilename  "appendonly.aof"
 			appendfsync no 将命令先存入AOF缓存区 由操作系统决定将缓存区命令写到磁盘，（存在数据丢失）
 			appendfsync everysec 将命令先存入AOF缓存区,每秒将缓存区数据写到AOF文件（存在数据库丢失）
 			appendfsync always 每执行一次命令，立即记录到AOF文件（数据不丢失，性能差）
-			
+	主从数据同步
+		原理
+			使用全量同步（RDB）+增量同步（repl-backlog环形数据），也就是说，第一次先master先把生成RDB文件到磁盘，然后在把文件发送到slave，最后利用缓冲数据增量同步即可
+		优化
+			1.可以把生成RDB数据不写磁盘，直接通过网络发送 repl-diskless-sync yes（可能造成网络堵塞）
+			2.减少每台redis内存大小（<20G）
+			3.减少全量同步次数，确保slave宕机的时间不要太久，并且设置repl-backlog-size 1mb的大小
 	主从集群（1主多从） redis.conf文件  
 		192.168.0.100(主，写数据)
 			port 6379
@@ -354,12 +360,18 @@ radis
 			sentinel down-after-milliseconds mymaster 5000
 			sentinel failover-timeout mymaster 60000
 			dir /data/
-	
-	集群数据同步优化方案
-		默认用RDB做全量同步+增加同步，可以改成网络同步 repl-diskless-sync yes
-		提高repl_baklog的大小
-
-	redis分片集群（多主多从	），不需要redis-sentinel来做监测了
+			
+	redis分片集群（多主多从），不需要redis-sentinel来做监测了
+		哈希分区算法
+			hash求余分区
+				缺点:扩容的时候影响全部节点数据
+			hash一致性分区
+				缺点:扩容的时候影响部分节点数据，机器数量少时会导致大量数据切斜问题
+			hash槽分区
+				解决了扩容问题
+					每个新加入的节点，都会在每个旧节点的槽里面拿出来一部分给新节点
+				解决数据倾斜问题
+					利用16384个槽来绑定数据
 		192.168.0.0.101-106 在redis.conf增加如下配置
 			port 6379
 			cluster-enabled yes 开启集群
@@ -370,7 +382,7 @@ radis
 			daemonize yes 开启后台运行
 			replica-announce-ip 192.168.0.101-106 （声明ip地址）
 			protected-mode no 保护模式(用户密码校验是否开启)
-			databases 1 数据库数量
+			databases 1 数据库数量(默认为16个)
 			logfile /tmp/data/run.log
 		启动redis集群
 			redis-server  /conf/redis.conf	
@@ -388,29 +400,51 @@ radis
 		集群命令
 			查看帮助
 				redis-cli --cluster help
-			查看状态
+			查看集群信息
+				redis-cli -h 192.168.0.203  -p 7006 cluster info
+			查看集群状态
 				redis-cli -h 192.168.0.203  -p 7006 cluster nodes
+			检查集群
+				redis-cli --cluster check 192.168.0.203:6379 
 			客户端连接
 				redis-cli -c -h 192.168.0.203  -p 7006 
-		散列插槽利用{???}来存取，可以路由到不同的master的插槽(slots)
-			{abc}aa
-			{abc1}aa
-			{abc2}aa
-		扩容redis master节点,这里还需要做插槽分配 redis-cli --cluster reshard,否则master没有使用的插槽
-			redis-cli --cluster add-node 192.168.1.107:6379  192.168.1.101:6379(集群中任意一个节点)
-		扩容redis slave节点	
-			redis-cli --cluster  add-node 192.168.1.107:6379  192.168.1.101:6379  --cluster-slave --cluster-master-id 7a23d544e7cf3300584c3da2d53e8abdf696947d
-		手动故障转移
-			1.先让该机器加入到集群中成为slave
+		扩容
+			增加master节点
+				增加节点
+					redis-cli --cluster add-node 192.168.1.107:6379  192.168.1.101:6379(集群中任意一个节点)
+				哈希槽分配
+					redis-cli --cluster reshard 【集群地址】
+						1. 填写槽数量(4096)  16384/4(master个数) = 4096个槽
+						2. 哪个ID接收(e3f47b1c9624)  加入集群的时候会有一个masterID ，或者通过redis-cli --cluster check 192.168.0.203:6379  查看
+						3. 来源IDs(all)  all代表所有id，或者手动输入每个Id最后使用done结束
+			增加slave节点	
+				redis-cli --cluster  add-node 192.168.1.107:6379  192.168.1.101:6379(集群中任意一个节点)  --cluster-slave --cluster-master-id 7a23d544e7cf3300584c3da2d53e8abdf696947d
+		缩容
+			删除slave节点
+				redis-cli --cluster del-node 【192.168.1.107:6379】【节点ID】
+			删除master节点
+				哈希槽分配
+					redis-cli --cluster reshard 【集群地址】
+						1. 填写槽数量(4096)  16384/4(master个数) = 4096个槽
+						2. 哪个ID接收(集群中任何一个主节点IDe3f47b1c9624)  加入集群的时候会有一个masterID ，或者通过redis-cli --cluster check 192.168.0.203:6379  查看
+						3. 来源IDs(准备删除节点IDe3f47b1c9624)  all代表所有id，或者手动输入每个Id最后使用done结束
+				删除节点
+					redis-cli --cluster del-node 【192.168.1.107:6379】【节点ID】
+		手动故障转移（指定某个slave变成master）
+			1.192.168.0.107这台机器最后由slave变成master
 			2.登陆slave客户端 redis-cli -h 192.168.0.107 -p 6379
 			3.执行 cluster failover
-                 
+		哈希(散列)插槽利用{???}来存取，可以路由到不同的master的插槽(slots)
+			{abc}aa
+			{abc1}aa
+			{abc2}aa	
+      
 多级缓存
 	思路（利用nginx代理到业务服务器openresty，openresty先从redis获取数据，获取不到在去tomcat获取）
 	caffeine本地缓存类似于guava
 		官方文档
 			https://github.com/ben-manes/caffeine/wiki/Cleanup-zh-CN
-	docker run -p 3306:3306 --name mysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged -d mysql:5.7.25		
+	docker run -p 3306:3306 --name mysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/var/logs/mysql -v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25		
 	OpenResty	
 	
 缓存同步
