@@ -107,7 +107,7 @@ docker安装
 		docker load -i ./zms_v1.tar 加载镜像到docker
 		
 	容器命令		
-		
+			
 		docker run -it ba6acccedd29 /bin/bash (默认执行bash,常用的有/bin/bash  bash /usr/bin/bash  sh /bin/sh /usr/bin/sh)
 		docker run -it --rm ba6acccedd29 /bin/bash 退出后删除容器
 		
@@ -158,7 +158,8 @@ docker安装
 		网络模式指定
 			docker run -it --net mynetwork2 cd202e250476 
 			docker run -it --network mynetwork2 cd202e250476 
-		
+		开机启动
+			docker run -it --restart always -d 1ad6c8779201  
 		 
 		docker ps  | grep nginx 筛选部分容器
 		
@@ -179,7 +180,30 @@ docker安装
 				
 		docker diff 0d31bb58d1d9  查看容器目录文件变化情况
 		docker wait 0d31bb58d1d9  监听容器退出的状态码	
-
+		
+	docker-compose命令(docker-compose对 docker run 的编排)
+		docker-compose面向的是服务操作
+			docker-compose -h 查看帮助文档
+			docker-compose up	 
+			docker-compose up -d 后台运行
+			docker-compose start 启动服务
+			docker-compose stop 停止服务
+			docker-compose kill 暴力停止服务
+			docker-compose pause 挂起服务
+			docker-compose unpause 取消挂起服务
+			docker-compose restart 重启服务
+			docker-compose rm -f 强制删除停止容器实例（不删除网络）
+			docker-compose list 查看所有镜像
+			docker-compose down 停止并且删除容器，网络
+				
+			docker-compose ps 查看所有编排过的容器
+			docker-compose top 查看所有编排过的容器进程
+			docker-compose config 检查配置，没问题列出配置
+			docker-compose config -q 检查配置，没问题不输出
+			
+			docker-compose logs zms-compose.yml服务id  查案容器某个容器的日志
+			docker-compose exec zms-compose.yml服务id /bin/bash 进入某个容器内部
+		
 docker网络命令
 	4种网络模式 https://www.jianshu.com/p/22a7032bb7bd
 		bridge 类似VM nat模式，单独网络空间
@@ -197,16 +221,17 @@ docker网络命令
 
 容器与容器之间的访问
 	默认bridge
-		ip           可以
-		容器ID       不可以
-		指定容器名字 不可以
-		默认容器名字 不可以
+		ip              可以
+		容器ID          不可以
+		指定容器名字    不可以
+		--network-alias 不可以
+		默认容器名字    不可以
 	自定义bridge
-		ip           可以
-		容器ID       可以
-		指定容器名字 可以（重点，一般需要指定 docker run --name serviceName --net myNetwork）
-		默认容器名字 不可以
-		
+		ip              可以
+		容器ID          可以
+		指定容器名字    可以（重点，一般需要指定 docker run --name serviceName --net myNetwork）
+		--network-alias 可以（重点，一般需要指定 docker run --name serviceName --net myNetwork --network-alias myalias1 --network-alias myalias2 ）	
+		默认容器名字    不可以
 Dockerfle命令
 	构建
 		docker build -t test:V1 /root/ 
@@ -248,12 +273,14 @@ Dockerfle命令
 	--------------------------CMD 和 ENTRYPOINT---------------------------------------
 	创建一个run.sh测试
 		vi /run.sh
-		#!/bin/bash
+		#!/bin/bash | #!/bin/sh 重点记得加上
 		echo $1
 		echo $2
 		echo $3
 		echo $4
 		echo $5
+		echo $JAVA_HOME
+		echo $JABA_PATH
 		/bin/bash
 	chmod 755 /run.sh
 
@@ -292,7 +319,7 @@ Dockerfle命令
 			docker run取消默认运行方式
 				 docker run --entrypoint /run.sh -it test:v1 参数1 参数2
 		
-docker-compose
+docker-compose (docker-compose对 docker run 的编排)
 	官方文档
 		https://docs.docker.com/compose/compose-file/compose-file-v3/
 	安装文件
@@ -306,7 +333,82 @@ docker-compose
 		docker-compose -version
 	卸载
 		rm -rf /usr/local/bin/docker-compose /usr/bin/docker-compose
-	
+
+	version: "3"
+
+	services:
+		zmsService: #可以访问
+			image: test:v2
+			container_name: zms #可以访问
+			restart: always # 等同 docker run --restart always
+			environment:
+				JAVA_HOME: '01234'
+				JABA_PATH: '56789'
+			ports:
+				- "8080:80"
+				- "8081:81"
+			volumes:
+				- datavolume:/data
+				- /root/data1:/data1
+			networks:
+				- my1
+			expose: #起到一个声明最庸，跟Dockerfile EXPOSE 或者是 docker run --expose 12345 --expose 22345
+				- "3000"
+				- "8000"
+			depends_on: #只是单纯的获取了容器的running状态，并不能实际解决项目的ready状态，所以需要外加辅助启动来达到真正意义上的依赖（https://zhuanlan.zhihu.com/p/365193592）
+				- redisService
+				- mysqlService
+			#---------------规则1---------------------
+			#单 CMD /run.sh 11 22 33 44
+			#command: /run.sh aaa bbb ccc  #覆盖执行命令
+			#---------------规则2---------------------
+			#单 ENTRYPOINT ["/run.sh","hello"]
+			#command: /run.sh aaa bbb ccc  #传递参数 最后参数结果为：hello /run.sh aaa bbb ccc
+			#---------------规则3---------------------
+			# 组合
+			#ENTRYPOINT ["/run.sh","hello"]
+			#CMD ["123","456"]
+			#command: /run.sh aaa bbb ccc  #覆盖变参数，结果为 hello /run.sh aaa bbb ccc
+			#entrypoint: ["/run.sh","11","22","33","44"]  # 覆盖命令，以及覆盖参数
+		appService:
+			image: test:v2
+			deploy:
+				replicas: 2
+
+		redisService:
+			image: test:v2
+			container_name: redis
+			ports:
+				- "8082:80"
+				- "8083:81"
+			volumes:
+				- datavolume:/data
+				- /root/data1:/data1
+			networks:
+				- my1
+				- my2
+		mysqlService:
+			image: test:v2
+			#container_name: mysql #可以访问 默认不写（zmsdir_mysqlService_1）
+			ports:
+				- "8084:80"
+				- "8085:81"
+			volumes:
+				- datavolume:/data
+				- /root/data1:/data1
+			networks:
+				- my2
+
+	volumes: #声明数据卷
+		datavolume:
+	networks: #声明网络（默认为bridge模式）
+		my1:
+		my2:
+	configs:
+		zmsconfig:
+			file: ./config.txt
+
+		
 dockerhub私服
 	server
 		下载
