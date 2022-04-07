@@ -1,0 +1,375 @@
+kubernetes （对容器的集群编排）
+	主要功能如下
+		1.自我修复:一旦某一个容器宕机，能够在段时间内启动新容器
+		2.弹性伸缩:可以根据需求，自动扩容或者缩容
+		3.服务发现:服务可以通过自动发现的形式找到他们所依赖的服务
+		4.负载均衡:能够实现多服务的请求分发
+		5.版本回退:如果新发布的程序出现BUG，可以立即回退到久版本运行
+		6.存储编排:可以根据容器自身的需求创建存储卷
+概念篇
+	集群
+		master
+			apiserver 
+				集群统一入口，以restful方式交互，数据持久化到etcd
+			shcheduler
+				节点调度器，计算服务合适部署在哪台work机器
+			controller-manager 
+				处理集群中常规后台任务，一个资源对应一个控制器
+			etcd
+				用于保存集群的相关数据
+		work
+			kebelet
+				负责对node节点中容器的管理
+			kube-proxy
+				提供网络代理和负载均衡
+	核心概念
+		lable
+			对资源打上标签，方便资源划分和查找以及管理
+		pod
+			k8s最小管理单元为pod，每个pod至少有1个（pause容器）或多个容器
+			pod控制器来负责管理pod
+			pod如果想对外提供服务，需要k8s提供的service来实现
+			pod生命周期
+				1.pod创建过程
+				2.运行初始化容器过程
+				3.运行主容器过程
+					容器启动后钩子
+					容器终止前钩子
+					容器存活性探测
+					容器就绪性探测
+				4.pod终止过程
+			pod状态(相位)
+				挂起(Pending): apiserver已经创建了pod资源对象，但尚未被调度完成或者处于下载镜像过程中
+				运行中(Running)：pod已经被调度至某节点，并且所有容器都已经被kueblei创建完成
+				成功(succeeded)：pod中的所有容器都已经成功终止并且不会被重启
+				失败(Failed)：所有容器都已经终止，但至少有一个容器终止失败，即容器返回了非0值的退出状态
+				未知(Unknown)：apiserver无法正常获取到pod对象的状态信息,通常由网络通信失败所导致
+				
+		namespaces
+			namespaces是用来做Pod的网络隔离，以及存储隔离，系统资源限制（cpu 内存....）
+		
+		deployments
+			deployments是pod控制器，负责对pod进行监控和管理（重启，重新发布，删除）
+		service 
+			service可以看作是同类pod对外访问的接口，借助service，应用可以方便的实现服务发现和负责均衡
+		controller
+			管理pod的运行状态，一旦pod宕机，及时恢复
+命令
+	资源管理
+		命令式对象管理：
+			kubectl create ns dev-ns
+			kubectl run nginx-pod --image=nginx:1.17.1 --port=80 -n dev-ns
+			kubectl delete ns dev-ns
+		命令式对象配置：支持单个文件操作
+			kubectl create -f nginx-pod.yaml 创建
+			kubectl get -f nginx-pod.yaml 获取
+ 			kubectl delete -f nginx-pod.yaml 删除
+		声明式对象配置：支持对多个文件批量操作（只能新增和更新）
+			kubectl apply -f ./k8sconfig/
+					
+	查看命令	
+		kubectl --help
+			基本命令
+				kubectl create 创建资源
+				
+					kubectl create ns dev-ns 创建命令空间
+					
+					kubectl create deploy nginxtest --image=nginx:1.14-alpine -n dev-ns 创建pod控制器
+					
+				kubectl edit 编辑资源
+				kubectl get 获取资源
+				
+					kubectl get nodes 查看slave节点信息
+				
+					kubectl get -f ./k8sconfig/  对多个文件查看
+					kubectl get -f ./k8sconfig/nginx-pod1.yaml  对单个文件查看
+				
+					kubectl get ns 查看所有命令空间
+					kubectl get ns dev-ns查看某个命令空间
+					
+					
+					kubectl get pods -A  -o wide 查看所有Pod
+					kubectl get pod  查看默认命名空间所有Pod
+					kubectl get pod nginx-6867cdf567-cjgdg 根据pod名字查
+					kubectl get pod -o [wide|yaml|json] 查看所有pod详细信息
+					kubectl get pod nginx-6867cdf567-cjgdg -o [wide|yaml|json] 查看某个pod详细信息
+					kubectl get pod -n dev-ns 查看某个命令空间下的pod
+					kubectl get pod -n dev-ns --show-labels 查看pod的标签信息
+					kubectl get pod -n dev -w	  watch监听pod
+					
+					
+					kubectl get deploy  查看所有部署
+					kubectl get deploy nginx  根据命令查看部署		
+					kubectl get deploy -o [wide|yaml|json]	查看所有pod控制器详细信息
+					kubectl get deploy nginx -o [wide|yaml|json] 查看某个pod控制器详细信息
+					kubectl get deploy -n dev -w	  watch监听deploy
+					
+					
+					kubectl get svc  查看所有服务
+					kubectl get svc nginx 根据服务名字查看	
+					kubectl get svc -o [wide|yaml|json] 查看所有服务的详细信息
+					kubectl get svc nginx -o [wide|yaml|json] 查看某个服务的详细信息
+					kubectl get svc -n dev -w	  watch监听svc
+							
+					kubectl get [pod/ns/deploy] -n dev-ns --show-labels 查看所有资源标签			
+					kubectl get [pod/ns/deploy] -n dev-ns -l version==1.0 --show-labels 单标签查找资源
+					kubectl get [pod/ns/deploy] -n dev-ns -l version!=1.0,env==test --show-labels 多个标签查找资源
+
+					
+				kubectl patch 更新资源
+				kubectl delete 删除资源
+				
+					kubectl delete -f ./k8sconfig/  对多个文件删除
+					kubectl delete -f ./k8sconfig/nginx-pod1.yaml 对单个文件删除
+				
+					kubectl delete ns dev-ns 删除某一个命名空间
+					
+					kubectl delete pod pod-864f9875b9-jtzx9 -n dev-ns  删除指定命名空间下的pod
+					
+					kubectl delete deploy nginxtest -n dev-ns  删除pod控制器
+												
+				kubectl explain 解析资源
+					
+					kubectl explain pod
+					kubectl explain pod.metadata
+					kubectl explain pod.spec.containers.livenessProbe
+					
+					kubectl explain svc
+					kubectl explain deploy
+					
+			运行和调试命令
+				kubectl run 在集群中运行一个指定镜像
+				
+					kubectl run testpod --image=nginx:1.14-alpine -n dev-ns （默认创建Pod控制器，然后在创建1个pod）
+					kubectl run testpod --image=nginx:1.14-alpine -n dev-ns --replicas 3 （默认创建Pod控制器，然后在创建3个pod）
+					
+				kubectl expose 暴露资源为Service
+				
+					kubectl expose deploy nginxtest --port=80 --type=NodePort 端口暴露
+					kubectl expose deploy testpod --name=svc-nginx --type=ClusterIP --port=80 --target-port=80 -n dev-ns 端口暴露
+				
+				kubectl describe 显示资源描述信息
+					
+					kubectl describe ns 查看所有命令空间详细信息
+					kubectl describe ns dev-ns 查看某个命令空间详细信息
+					
+					kubectl describe pod  -n dev-ns 查看所有Pod的描述信息
+					kubectl describe pod pod-864f9875b9-n2gvb -n dev-ns 查看单个pod描述信息
+					
+					kubectl describe deploy 查看所有pod控制器详细信息
+					kubectl describe deploy nginxtest -n dev-ns 查看单个pod控制器详细信息
+					
+				kubectl logs 输出容器在pod中的日志
+				kubectl attach 进入运行中的容器(共用容器shell)
+					
+					kubectl attach pod mypod-demo2  -n dev  -c nginx 
+					kubectl attach pod mypod-demo1  -n dev  -c nginx 
+					kubectl attach pod mypod-demo1  -n dev  -c busybox			
+					
+				kubectl exec 执行容器中的命令(新创建一个shell并执行命令)
+				
+					kubectl exec mypod-demo1 -n dev -it  -c nginx sh 
+					kubectl exec mypod-demo1 -n dev -it -c nginx sh /run.sh arg1 arg2
+					kubectl exec mypod-demo1 -n dev -it -c busybox sh /run1.sh arg1 arg2
+				
+				kubectl cp 在pod内外复制文件
+				kubectl rollout 管理资源的发布
+				kubectl scale 扩缩容pod的数量
+				kubectl autoscale 自动调整pod数量
+			高级命令
+				kubectl apply 通过文件对资源进行配置（只能新增和更新）
+				
+					kubectl apply -f ./k8sconfig/  整个目录进程创建或者更新
+					kubectl apply -f ./k8sconfig/nginx-pod1.yaml   指定一个文件创建或者更新
+				
+				kubectl label 资源标签
+				
+					kubectl label [pod/ns/deploy] --all version=1.0 -n dev-ns  对所有pod进行打标签
+					kubectl label [pod/ns/deploy] nginxpod version=1.0 -n dev-ns  对单个pod进行打标签
+					kubectl label [pod/ns/deploy] nginxpod version=1.0 env=dev -n dev-ns  对单个pod打多个标签
+					
+					kubectl label [pod/ns/deploy] --all --overwrite=true version=3.0 -n dev-ns  更新所有资源标签
+					kubectl label [pod/ns/deploy] nginxpod --overwrite=true version=3.0 -n dev-ns  更新单个资源标签
+					
+					kubectl label [pod/ns/deploy] nginxpod  version- -n dev-ns 删除单个资源标签
+					kubectl label [pod/ns/deploy] --all version- -n dev-ns 删除所有资源标签		
+					
+			其他命令
+				kubectl cluster-info 显示集群信息
+				kubectl version 显示server和client版本
+	查看所有api版本
+		kubectl api-versions
+	查看所有资源
+		kubectl api-resources  
+			集群级别资源
+				[nodes|no][kind:Node][ns:false]
+				[namespaces|ns][kind:Namespace][ns:false]				
+			pod资源
+				[pods|po|pod][kind:Pod][ns:true]		
+			pod资源控制器
+				[replicationcontrollers|rc][kind:ReplicationController][ns:true]
+				[replicasets|rs][kind:ReplicaSet][ns:true]
+				[deployments|deploy][kind:Deployment][ns:true]	
+				[daemonsets|ds][kind:DaemonSet][ns:true]
+				[jobs][kind:Job][ns:true]
+				[cronjobs|cj][kind:CronJob][ns:true]
+				[horizontalpodautoscalers hpa][kind:HorizontalPodAutoscaler][ns:true]
+				[statefulsets|sts][kind:StatefulSet][ns:true]
+			服务发现资源
+				[services|service|svc][kind:Service][ns:true]			
+				[ingress][kind:Ingress][ns:true]
+			存储资源
+				[volumeattachments][kind:VolumeAttachment][ns:false]
+				[persistentvolumes|pv][kind:PersistentVolume][ns:false]
+				[persistentvolumeclaims|pvc][kind:PersistentVolumeClaim][ns:true]
+			配置资源
+				[configmaps|cm][kind:ConfigMap][ns:true]
+				[secrets][kind:Secret][ns:true]	
+				
+环境依赖安装：
+	设置主机host，重要：主机名不配置，后面会导致slave加入master出问题
+		hostnamectl set-hostname master 
+		hostnamectl set-hostname node1 
+		hostnamectl set-hostname node2 
+	设置hosts域名解析	
+		tee >> /etc/hosts << EOF
+		192.168.88.12 master
+		192.168.88.13 node1
+		192.168.88.14 node2
+		EOF
+	网络时间同步
+		方式1
+			yum -y install ntp ntpdate && ntpdate cn.pool.ntp.org && hwclock --systohc && hwclock -w	
+		方式2
+			yum install -y chrony
+			systemctl start chronyd && systemctl enable chronyd
+	禁用防火墙
+		systemctl stop firewalld && systemctl disable firewalld  
+	禁用selinux
+		setenforce 0 临时关闭
+		sed -i 's/enforcing/disabled/' /etc/selinux/config 永久关闭
+	关闭swap分区
+		swapoff -a 临时关闭
+		sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab 永久关闭
+	修改linux的内核参数
+		1.将桥接的IPv4流量传递到iptables的链
+			tee /etc/sysctl.d/k8s.conf <<-'EOF'
+			net.bridge.bridge-nf-call-ip6tables = 1
+			net.bridge.bridge-nf-call-iptables = 1
+			EOF
+			tee /etc/modules-load.d/k8s.conf <<-'EOF'
+			br_netfilter
+			EOF
+		2.重新加载配置 
+			sysctl --system
+	重启系统
+		init 6
+	确保 br_netfilter 模块被加载
+		lsmod | grep br_netfilter
+		
+docker安装（19.03.3）
+	yum -y install gcc gcc-c++ yum-utils device-mapper-persistent-data lvm2		 				
+	yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+	yum makecache fast
+	yum -y install docker-ce-19.03.3 docker-ce-cli-19.03.3 containerd.io
+		
+	添加阿里云加速器和k8s的推荐使用的cgroup(docker info查看，默认使用 Cgroup Driver: cgroupfs)			
+	mkdir -p /etc/docker
+	tee /etc/docker/daemon.json <<-'EOF'
+	{
+	  "exec-opts": ["native.cgroupdriver=systemd"],
+	  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"]
+	}
+	EOF
+			
+	systemctl daemon-reload && systemctl start docker && systemctl enable docker.service
+	
+k8s安装（1.17.4-0）
+	官方文档
+		https://kubernetes.io/zh/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+	注意大坑（一定要7.5以上的centos，不然后面服务的集群ip可能无法正常访问）
+		cat /etc/redhat-release 
+		CentOS Linux release 7.4.1708 (Core) 
+	配置阿里镜像源
+		tee /etc/yum.repos.d/kubernates.repo <<-'EOF'
+		[kubernetes]
+		name=Kubernetes
+		baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+		enabled=1
+		gpgcheck=0
+		repo_gpgcheck=0
+		gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+			   https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+		EOF
+	更新缓存		
+		yum makecache fast
+	查看版本
+		yum list kubelet --showduplicates | sort -r	 (注意顶部的版本不一定是最新的)
+	安装【kubectl】【kubelet】【kubeadm】
+		yum install -y kubelet-1.17.4-0 kubeadm-1.17.4-0 kubectl-1.17.4-0
+	设置kubelet开机启动
+		systemctl enable kubelet
+	初始化master（192.168.88.12）
+		方式1
+			查看依赖的容器并下载
+				kubeadm config images list
+			下载
+				images=(
+				kube-apiserver:v1.17.4
+				kube-controller-manager:v1.17.4
+				kube-scheduler:v1.17.4
+				kube-proxy:v1.17.4
+				pause:3.1
+				etcd:3.4.3-0
+				coredns:1.6.5 
+				)
+				for imageName in ${images[@]} ; 
+				do
+					docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName
+					docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName
+					docker rmi registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName
+				done	
+				kubeadm init --kubernetes-version v1.17.4 --apiserver-advertise-address=192.168.88.12  --service-cidr=10.96.0.0/12 --pod-network-cidr=10.244.0.0/16
+		方式2
+			kubeadm init --kubernetes-version v1.17.4 --image-repository registry.aliyuncs.com/google_containers  --apiserver-advertise-address=192.168.88.12  --service-cidr=10.96.0.0/12 --pod-network-cidr=10.244.0.0/16 
+		配置初始化
+			mkdir -p $HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config
+		查看集群状态
+			kubectl get nodes
+	初始化slave（192.168.88.13，192.168.88.14）
+		slave加入master
+			kubeadm join 192.168.88.12:6443 --token d87rt8.d8pjd3mfgo8zyu2k --discovery-token-ca-cert-hash sha256:7c3ca32f59ae50edfcdb3b2328599ca9faf489934a64f01c9df5a60e4d59929a 
+		过期后重新生成
+			kubeadm token create --print-join-command 
+	网络安装在master执行即可（flannel calico canal）
+		应用网络
+			kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+		查看网络pod是否启动成功
+			kubectl get pod -A
+		查看集群状态
+			kubectl get nodes		
+	在master做案例测试
+		创建命名空间
+			kubectl create ns dev
+		运行1个deploy控制器，并且绑定2个pod
+			kubectl run testpod --image=nginx:1.14-alpine -n dev --replicas 2
+		service通过通过控制器绑定pod关系
+			kubectl expose deploy testpod --name=svc-nginx --type=ClusterIP --port=8080 --target-port=80 -n dev
+		查看pod状态
+			kubectl get pods -n dev
+		查看service状态
+			kubectl get svc -n dev
+		测试运行
+			curl 10.110.91.213:8080
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

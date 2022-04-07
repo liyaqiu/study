@@ -75,25 +75,33 @@ https://blog.csdn.net/xts5701046/article/details/81395958
 	一致性
 	隔离性（根据隔离的不同，CURD都需要用到事务，每个connection建立的session都会用到事务，只不过默认是自动提交）
 		   (如果你的事务隔离级别设置为读未提交，那么你的session会读到脏数据)
-		读未提交  脏读,不可重复读,幻读
-		读已提交       不可重复读,幻读
-		可重复读                  幻读
-		串行化
+		读未提交  脏读,不可重复读,幻读  （没锁）
+		读已提交       不可重复读,幻读  （没锁）
+		可重复读                  幻读  （没锁）（mysql 解决了这个问题）
+		串行化读                        （加共享锁）
 	持久性
-														   	
+
+脏读         可以读取对方未提交的数据
+不可重复读   一般指的是数据的修改，2次读取的数据值不一样
+幻读         一般指数据的增加或者删除，2次读取的数据数量上不一样
+
+	
 oracle默认事务隔离级别为（读已提交）
 mysql默认事务隔离级别为（可重复读）
 
+innodb支持事务
+myisam不支持事务
 
 锁分为
 	读锁（共享锁）
 	写锁（排它锁）
 锁主的范围
 	行锁（对行加锁）
-		innodb默认用的是行锁
 	间隙锁（对范围加锁）
 	表锁（对表加锁）
-		myisam存储引擎默认用的是表锁
+		
+ SELECT * from acl_user where uid =11 LOCK IN SHARE MODE; 手动指定共享锁		
+ SELECT * from acl_user where uid =10 FOR UPDATE; 手动指定排它锁		
 
 查看锁的争抢情况
 	show status like 'innodb_row_lock%';
@@ -239,10 +247,10 @@ mysql 启动
 SELECT @@transaction_isolation;
 select @@global.transaction_isolation;	
 	
-set session transaction isolation level read uncommitted
-set session transaction isolation level read committed
-set session transaction isolation level repeatable read	
-set session transaction isolation level serializable
+set session transaction isolation level read uncommitted;
+set session transaction isolation level read committed;
+set session transaction isolation level repeatable read;
+set session transaction isolation level serializable;
 
 
 START TRANSACTION;

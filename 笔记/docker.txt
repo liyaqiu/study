@@ -28,20 +28,22 @@ docker安装
 				docker-ce.x86_64            3:20.10.4-3.el7                     docker-ce-stable
 				
 				取:{20.10.9}-
-			yum -y install docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
+			yum -y install docker-ce-19.03.3 docker-ce-cli-19.03.3 containerd.io
         启动
+			systemctl enable docker.service
 			systemctl start docker
-        添加阿里云加速器					
+        添加阿里云加速器和k8s的推荐使用的cgroup(docker info查看，默认使用 Cgroup Driver: cgroupfs)			
 			mkdir -p /etc/docker
 			tee /etc/docker/daemon.json <<-'EOF'
 			{
+			  "exec-opts": ["native.cgroupdriver=systemd"],
 			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"]
 			}
 			EOF
 			systemctl daemon-reload && systemctl restart docker 
 		运行 docker run --name nginx-test -p 8080:80 -d nginx
 	卸载
-		yum remove docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
+		yum remove -y docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
 		rm -rf /var/lib/docker
 		rm -rf /var/lib/containerd
 		
@@ -74,7 +76,10 @@ docker安装
 		systemctl status docker 查看状态
 		
 		systemctl enable docker 开机启动
-		
+	
+	运维相关命令
+		docker stats  查看容器运行情况，以及CPU占用率等
+		docker system df 查看镜像/容器/数据卷的占用情况 
 	镜像命令
 		docker search nginx 查找镜像
 		
@@ -82,9 +87,7 @@ docker安装
 		docker images -qa 紧显示镜像IDs
 		docker images nginx:1.*  查找部分相关版本
 		
-		docker history  605c77e624dd  查看镜像构建信息
-		docker system df 查看镜像/容器/数据卷的占用情况 
-		
+	
 		docker rmi 605c77e624dd 删除
 		docker rmi -f 605c77e624dd 强制删除镜像
 		docker rmi -f $(docker images -qa) 强制删除所有镜像
@@ -95,9 +98,11 @@ docker安装
 		docker rmi -f $(docker images -qf dangling=true) 强制删除所有虚悬镜像
 		docker images -qf dangling=true | xargs docker rmi -f 强制删除所有虚悬镜像
 		docker image prune 删除所有虚悬对象(不删除容器关联的)
+		docker image inspect test:v5  查看镜像的信息
 		
 		docker pull nginx:latest
 		
+		docker history  605c77e624dd  查看镜像构建信息
 		
 		docker login eric
 		docker tag zms:v1 www.eric.com:1234/zms:v1
@@ -263,6 +268,8 @@ Dockerfle命令
 	VOLUME声明挂载目录，如果用户不用-v进行挂载，会默认挂载出来（通过docker inspect查看）,如果用户指定-v挂载，则会覆盖默认挂载
 		VOLUME ["/data","/data1"]
 
+	LABEL 为镜像打标签
+		LABEL version="snapshot-1.0" auther="eric" email="361234567@qq.com"
 
 	ADD会拷贝并且作为tar文件解压
 		ADD ./redis.tar /data/
@@ -272,7 +279,7 @@ Dockerfle命令
 
 	--------------------------CMD 和 ENTRYPOINT---------------------------------------
 	创建一个run.sh测试
-		vi /run.sh
+		vi run.sh
 		#!/bin/bash | #!/bin/sh 重点记得加上
 		echo $1
 		echo $2
@@ -334,79 +341,81 @@ docker-compose (docker-compose对 docker run 的编排)
 	卸载
 		rm -rf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-	version: "3"
+------------docker-compose.yml start-------------------
+version: "3"
 
-	services:
-		zmsService: #可以访问
-			image: test:v2
-			container_name: zms #可以访问
-			restart: always # 等同 docker run --restart always
-			environment:
-				JAVA_HOME: '01234'
-				JABA_PATH: '56789'
-			ports:
-				- "8080:80"
-				- "8081:81"
-			volumes:
-				- datavolume:/data
-				- /root/data1:/data1
-			networks:
-				- my1
-			expose: #起到一个声明最庸，跟Dockerfile EXPOSE 或者是 docker run --expose 12345 --expose 22345
-				- "3000"
-				- "8000"
-			depends_on: #只是单纯的获取了容器的running状态，并不能实际解决项目的ready状态，所以需要外加辅助启动来达到真正意义上的依赖（https://zhuanlan.zhihu.com/p/365193592）
-				- redisService
-				- mysqlService
-			#---------------规则1---------------------
-			#单 CMD /run.sh 11 22 33 44
-			#command: /run.sh aaa bbb ccc  #覆盖执行命令
-			#---------------规则2---------------------
-			#单 ENTRYPOINT ["/run.sh","hello"]
-			#command: /run.sh aaa bbb ccc  #传递参数 最后参数结果为：hello /run.sh aaa bbb ccc
-			#---------------规则3---------------------
-			# 组合
-			#ENTRYPOINT ["/run.sh","hello"]
-			#CMD ["123","456"]
-			#command: /run.sh aaa bbb ccc  #覆盖变参数，结果为 hello /run.sh aaa bbb ccc
-			#entrypoint: ["/run.sh","11","22","33","44"]  # 覆盖命令，以及覆盖参数
-		appService:
-			image: test:v2
-			deploy:
-				replicas: 2
+services:
+    zmsService: #可以访问
+        image: test:v2
+        container_name: zms #可以访问
+        restart: always # 等同 docker run --restart always
+        environment:
+            JAVA_HOME: '01234'
+            JABA_PATH: '56789'
+        ports:
+            - "8080:80"
+            - "8081:81"
+        volumes:
+            - datavolume:/data
+            - /root/data1:/data1
+        networks:
+            - my1
+        expose: #起到一个声明最庸，跟Dockerfile EXPOSE 或者是 docker run --expose 12345 --expose 22345
+            - "3000"
+            - "8000"
+        depends_on: #只是单纯的获取了容器的running状态，并不能实际解决项目的ready状态，所以需要外加辅助启动来达到真正意义上的依赖（https://zhuanlan.zhihu.com/p/365193592）
+            - redisService
+            - mysqlService
+        #---------------规则1---------------------
+        #单 CMD /run.sh 11 22 33 44
+        #使用方式
+        #command: /run.sh aaa bbb ccc  #覆盖执行命令
+        #---------------规则2---------------------
+        #单 ENTRYPOINT ["/run.sh","hello"]
+        #使用方式
+        #command: /run.sh aaa bbb ccc  #传递参数 最后参数结果为：hello /run.sh aaa bbb ccc
+        #---------------规则3---------------------
+        # 组合
+        #ENTRYPOINT ["/run.sh","hello"]
+        #CMD ["123","456"]
+        #使用方式
+        #command: /run.sh aaa bbb ccc  #覆盖变参数，结果为 hello /run.sh aaa bbb ccc
+        #entrypoint: ["/run.sh","11","22","33","44"]  # 覆盖命令，以及覆盖参数
+    appService:
+        image: test:v2
+        deploy:
+            replicas: 2
 
-		redisService:
-			image: test:v2
-			container_name: redis
-			ports:
-				- "8082:80"
-				- "8083:81"
-			volumes:
-				- datavolume:/data
-				- /root/data1:/data1
-			networks:
-				- my1
-				- my2
-		mysqlService:
-			image: test:v2
-			#container_name: mysql #可以访问 默认不写（zmsdir_mysqlService_1）
-			ports:
-				- "8084:80"
-				- "8085:81"
-			volumes:
-				- datavolume:/data
-				- /root/data1:/data1
-			networks:
-				- my2
+    redisService:
+        image: test:v2
+        container_name: redis
+        ports:
+            - "8082:80"
+            - "8083:81"
+        volumes:
+            - datavolume:/data
+            - /root/data1:/data1
+        networks:
+            - my1
+            - my2
+    mysqlService:
+        image: test:v2
+        #container_name: mysql #可以访问 默认不写（zmsdir_mysqlService_1）
+        ports:
+            - "8084:80"
+            - "8085:81"
+        volumes:
+            - datavolume:/data
+            - /root/data1:/data1
+        networks:
+            - my2
 
-	volumes: #声明数据卷
-		datavolume:
-	networks: #声明网络（默认为bridge模式）
-		my1:
-		my2:
-	configs:
-		zmsconfig:
-			file: ./config.txt
+volumes: #声明数据卷
+    datavolume:
+networks: #声明网络（默认为bridge模式）
+    my1:
+    my2:
+------------docker-compose.yml end---------------------
 
 		
 dockerhub私服
@@ -564,12 +573,19 @@ redis分片集群安装
 		2.登陆slave客户端 redis-cli -h 192.168.88.11 -p 6382  
 		3.执行 cluster failover
 
+容器管理工具 portainer
+	官方文档
+		https://www.portainer.io/
+	安装
+		docker run -d -p 8000:8000 -p 9443:9443 --name portainer  --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data  portainer/portainer-ce:2.9.3
+	访问地址
+		https://192.168.88.11:9443/
 
 
 
-
-
-
+容器监控CIG（CAdvisor+InfluxDB+Granafa）
+	docker stats  查看容器运行情况，以及CPU占用率等
+	
 
 
 

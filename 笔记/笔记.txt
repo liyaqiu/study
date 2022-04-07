@@ -36,21 +36,30 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-docker https://www.bilibili.com/video/BV1gr4y1U7CY?p=87&spm_id_from=pageDriver
 
 
 
-k8s 
-	https://www.bilibili.com/video/av245141112?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
-	https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
+k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=26
+	https://www.bilibili.com/video/BV1GT4y1A756?p=8  二进制方式安装
 
-	
-	
+
+云原生  https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
+
+jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113		
+
+
+
+
+
 	
 		
-jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113		
+
 		
 spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
 Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver  最后在学
 spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
                 https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
+				
+运维相关				
+linux    https://www.bilibili.com/video/BV1pz4y1D73n?p=617	
+lvs https://www.bilibili.com/video/BV18f4y1U7St?p=2&spm_id_from=pageDriver					
