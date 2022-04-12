@@ -39,7 +39,7 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=26
+k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=64
 	https://www.bilibili.com/video/BV1GT4y1A756?p=8  二进制方式安装
 
 
@@ -48,9 +48,9 @@ k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=26
 jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113		
 
 
+postman学习 https://www.bilibili.com/video/BV11K4y1J7sh?spm_id_from=333.337.search-card.all.click
 
-
-
+jmeter学习 https://www.bilibili.com/video/BV1hq4y1K75i?spm_id_from=333.337.search-card.all.click
 	
 		
 
@@ -62,4 +62,19 @@ spring系统实践  https://www.bilibili.com/video/BV1tw411f79E
 				
 运维相关				
 linux    https://www.bilibili.com/video/BV1pz4y1D73n?p=617	
-lvs https://www.bilibili.com/video/BV18f4y1U7St?p=2&spm_id_from=pageDriver					
+lvs https://www.bilibili.com/video/BV18f4y1U7St?p=2&spm_id_from=pageDriver		
+	https://www.zsythink.net/archives/tag/lvs/
+前端相关知识
+
+
+
+
+
+
+vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=6
+nodejs https://www.bilibili.com/video/BV1a34y167AZ?spm_id_from=333.999.0.0
+es6 https://www.bilibili.com/video/BV1uK411H7on?p=8
+webpack
+axios
+elementUI
+			
