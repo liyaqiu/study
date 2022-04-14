@@ -41,7 +41,15 @@ docker安装
 			}
 			EOF
 			systemctl daemon-reload && systemctl restart docker 
+		开启ipv4流量转发（虚拟机挂起会导致模块加载不了）
+			tee /etc/sysctl.d/dcoker.conf <<-'EOF'
+			net.ipv4.ip_forward = 1
+			EOF
+		查看
+			sysctl -a | grep ip_forward
+		
 		运行 docker run --name nginx-test -p 8080:80 -d nginx
+		
 	卸载
 		yum remove -y docker-ce-20.10.9 docker-ce-cli-20.10.9 containerd.io
 		rm -rf /var/lib/docker

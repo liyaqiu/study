@@ -1,3 +1,6 @@
+命令行图形界面
+	https://github.com/derailed/k9s
+
 kubernetes （对容器的集群编排）
 	主要功能如下
 		1.自我修复:一旦某一个容器宕机，能够在段时间内启动新容器
@@ -76,6 +79,22 @@ kubernetes （对容器的集群编排）
 		kubeproxy:
 			在iptables和ipvs模式下，负责创建service规则
 			在userspace模式下，sevice充当了负载均衡器
+	数据卷（Volume）
+		概念:同一个Pod下，容器之间共享数据卷
+		简单存储
+			EmptyDir
+				生命周期跟随Pod（由k8s来维护，一旦pod删除，数据卷也删除）
+			HostPath
+				将数据卷挂载到自己的目录下
+			NFS（网络文件存储系统）
+			CIFS
+		高级存储
+			PV
+			PVC
+		配置存储
+			ConfigMap
+			Secret
+		
 命令
 	资源管理
 		命令式对象管理：
@@ -167,8 +186,10 @@ kubernetes （对容器的集群编排）
 					kubectl get svc nginx -o [wide|yaml|json] 查看某个服务的详细信息
 					kubectl get svc -n dev -w	  watch监听svc
 					
-					kubectl  get ep -A -o wide --show-labels 查看所有service关联的endpoints资源
-					kubectl  get ep -n dev -o wide --show-labels 查看service关联的endpoints资源
+					kubectl get ep -A -o wide --show-labels 查看所有endpoints资源
+					kubectl get ep -n dev -o wide --show-labels 查看endpoints资源
+					
+					kubectl get ing -n dev 查看所有ingress资源
 					
 					kubectl get [pod/ns/deploy] -n dev-ns --show-labels 查看所有资源标签			
 					kubectl get [pod/ns/deploy] -n dev-ns -l version==1.0 --show-labels 单标签查找资源
@@ -228,6 +249,9 @@ kubernetes （对容器的集群编排）
 					kubectl describe rs rsname -n dev
 					
 				kubectl logs 输出容器在pod中的日志
+				
+					kubectl logs -f podName -n dev -c containerName
+					
 				kubectl attach 进入运行中的容器(共用容器shell)
 					
 					kubectl attach pod mypod-demo2  -n dev  -c nginx 
@@ -236,9 +260,9 @@ kubernetes （对容器的集群编排）
 					
 				kubectl exec 执行容器中的命令(新创建一个shell并执行命令)
 				
-					kubectl exec mypod-demo1 -n dev -it  -c nginx sh 
-					kubectl exec mypod-demo1 -n dev -it -c nginx sh /run.sh arg1 arg2
-					kubectl exec mypod-demo1 -n dev -it -c busybox sh /run1.sh arg1 arg2
+					kubectl exec podname -n dev -it  -c containerName sh 
+					kubectl exec podname -n dev -it -c containerName sh /run.sh arg1 arg2
+					kubectl exec podname -n dev -it -c containerName sh /run1.sh arg1 arg2
 				
 				kubectl cp 在pod内外复制文件
 				kubectl rollout 管理资源的发布
@@ -326,7 +350,7 @@ kubernetes （对容器的集群编排）
 			服务发现资源
 				[services|service|svc][kind:Service][ns:true]		
 				[endpoints|ep][kind:Endpoints][ns:true]	
-				[ingress][kind:Ingress][ns:true]
+				[ingress|ing][kind:Ingress][ns:true]
 			存储资源
 				[volumeattachments][kind:VolumeAttachment][ns:false]
 				[persistentvolumes|pv][kind:PersistentVolume][ns:false]

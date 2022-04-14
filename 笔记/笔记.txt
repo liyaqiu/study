@@ -39,7 +39,7 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=64
+k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=73&spm_id_from=pageDriver
 	https://www.bilibili.com/video/BV1GT4y1A756?p=8  二进制方式安装
 
 
