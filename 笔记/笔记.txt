@@ -39,9 +39,8 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-k8s https://www.bilibili.com/video/BV1cK4y1L7Am?p=73&spm_id_from=pageDriver
-	https://www.bilibili.com/video/BV1GT4y1A756?p=8  二进制方式安装
-
+k8s https://www.bilibili.com/video/BV1w4411y7Go?spm_id_from=333.337.search-card.all.click
+	https://www.bilibili.com/video/BV1GT4y1A756?p=35
 
 云原生  https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
 

@@ -90,11 +90,14 @@ kubernetes （对容器的集群编排）
 			CIFS
 		高级存储
 			PV
+				实际定义了数据卷
 			PVC
-		配置存储
+				数据卷索取
+		配置存储（存储到K8s集群里面）
 			ConfigMap
+				支持动态更新
 			Secret
-		
+				支持动态更新
 命令
 	资源管理
 		命令式对象管理：
@@ -133,6 +136,8 @@ kubernetes （对容器的集群编排）
 					kubectl edit deploy deployname -n dev  编辑deploy配置文件					
 					 
 					kubectl edit pod rsname-2vlb9  -n dev  编辑Pod配置文件
+					
+					kubectl edit cm configmap-name  -n dev
 							
 				kubectl set 修改配置
 				
@@ -190,6 +195,13 @@ kubernetes （对容器的集群编排）
 					kubectl get ep -n dev -o wide --show-labels 查看endpoints资源
 					
 					kubectl get ing -n dev 查看所有ingress资源
+					
+					kubectl get pv -o wide --show-labels -w
+					kubectl get pvc -o wide --show-labels -w -n dev
+					 		
+					kubectl get cm -o wide --show-labels -w -n dev 					
+					
+					kubectl get secrets -o wide --show-labels -w -n dev 		
 					
 					kubectl get [pod/ns/deploy] -n dev-ns --show-labels 查看所有资源标签			
 					kubectl get [pod/ns/deploy] -n dev-ns -l version==1.0 --show-labels 单标签查找资源
@@ -321,6 +333,7 @@ kubernetes （对容器的集群编排）
 					kubectl top pod -n kube-system 查看某个命名空间下的Pod资源使用情况
 					kubectl top pod podname -n kube-system
 				
+				
 				kubectl cluster-info 显示集群信息
 				kubectl version 显示server和client版本
 	查看所有api版本
@@ -353,10 +366,14 @@ kubernetes （对容器的集群编排）
 				[ingress|ing][kind:Ingress][ns:true]
 			存储资源
 				[volumeattachments][kind:VolumeAttachment][ns:false]
-				[persistentvolumes|pv][kind:PersistentVolume][ns:false]
-				[persistentvolumeclaims|pvc][kind:PersistentVolumeClaim][ns:true]
+				
+				[persistentvolumes|pv][kind:PersistentVolume][ns:false] k8s管理人员负责创建真实的持久卷
+				[persistentvolumeclaims|pvc][kind:PersistentVolumeClaim][ns:true] 用户申请持久卷声明
+				
 			配置资源
-				[configmaps|cm][kind:ConfigMap][ns:true]
+			
+				[configmaps|cm][kind:ConfigMap][ns:true] 是一种特殊的存储卷key value结构
+				
 				[secrets][kind:Secret][ns:true]	
 				
 
@@ -420,6 +437,7 @@ metrics-server安装 查看k8s集群资源使用情况(https://github.com/kubern
 		kubectl top pod podname -n kube-system
 	
 		
+
 		
 		
 		
