@@ -20,7 +20,7 @@ idea使用git
 
 SpringBoot项目下的mvnw与mvnw.cmd  https://blog.csdn.net/weixin_41917449/article/details/81867018
 
-jenkins
+
 电商系统学习
 
 
@@ -37,10 +37,8 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
+jenkins  https://www.bilibili.com/video/BV1kJ411p7mV?p=35&spm_id_from=pageDriver
 
-
-k8s https://www.bilibili.com/video/BV1w4411y7Go?spm_id_from=333.337.search-card.all.click
-	https://www.bilibili.com/video/BV1GT4y1A756?p=35
 
 云原生  https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
 

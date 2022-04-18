@@ -46,6 +46,7 @@ docker安装
 			net.ipv4.ip_forward = 1
 			EOF
 		查看
+			sysctl --system
 			sysctl -a | grep ip_forward
 		
 		运行 docker run --name nginx-test -p 8080:80 -d nginx
@@ -254,10 +255,13 @@ Dockerfle命令
 	MAINTAINER 维护者信息
 		MAINTAINER eric
 
-	ENV环境变量设定(可以在整个Dockerfile文件中${xxxenv}获取})
+	ENV环境变量设定
 		ENV JAVA_HOME /root/jdk1.8.0_191
 		ENV JAVA_BIN  $JAVA_HOME/bin
-
+	
+	ARG 该参数只在构建的时候生效
+		ARG env_arg
+		docker build -t test:v1 . --build-arg env_arg=pro
 	RUN运行方式
 		shell格式
 			RUN sh /root/zms.sh arg1 arg2
@@ -343,9 +347,7 @@ docker-compose (docker-compose对 docker run 的编排)
 		https://github.com/docker/compose/releases
 	下载
 		curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-		chmod +x /usr/local/bin/docker-compose
-		ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-		docker-compose -version
+		chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && docker-compose -version	
 	卸载
 		rm -rf /usr/local/bin/docker-compose /usr/bin/docker-compose
 
@@ -426,42 +428,52 @@ networks: #声明网络（默认为bridge模式）
 ------------docker-compose.yml end---------------------
 
 		
-dockerhub私服
-	server
-		下载
-			docker pull registry
-		配置
-			mkdir -p /etc/docker
-			tee /etc/docker/daemon.json <<-'EOF'
-			{
-			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
-			  "insecure-registries": ["192.168.88.19:5000"]
-			}
-			EOF
-			systemctl daemon-reload
-			systemctl restart docker   
-		运行私服容器	
-			docker run -d -p 5000:5000 --restart always -v /root/registrydir:/var/lib/registry --privileged=true --name registry registry:latest			
-	client	
-		配置
-			mkdir -p /etc/docker
-			tee /etc/docker/daemon.json <-'EOF'
-			{
-			  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
-			  "insecure-registries": ["192.168.88.19:5000,192.168.88.19:6000"]
-			}
-			EOF
-			systemctl daemon-reload && systemctl restart docker 
-		查看仓库
-			curl -XGET http://192.168.88.19:5000/v2/_catalog	
-			
-		推送
-			docker tag 50fe74b50e0d 192.168.88.19:5000/myspace/myubuntu:v2	
-			docker push 192.168.88.19:5000/myspace/myubuntu:v2	
-		拉取
-			docker pull 192.168.88.19:5000/myspace/myubuntu:v2	
-			
-
+私服
+	dockerhub
+		server
+			下载
+				docker pull registry:latest
+			运行私服容器	
+				docker run -d -p 5000:5000 --restart always -v /root/registrydir:/var/lib/registry --privileged=true --name registry registry:latest
+		client	
+			配置
+				mkdir -p /etc/docker
+				tee /etc/docker/daemon.json <-'EOF'
+				{
+				  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
+				  "insecure-registries": ["192.168.88.19:5000,192.168.88.19:6000"]
+				}
+				EOF
+				systemctl daemon-reload && systemctl restart docker 
+			查看仓库
+				curl -XGET http://192.168.88.19:5000/v2/_catalog	
+				
+			推送
+				docker tag 50fe74b50e0d 192.168.88.19:5000/myspace/myubuntu:v2	
+				docker push 192.168.88.19:5000/myspace/myubuntu:v2	
+			拉取
+				docker pull 192.168.88.19:5000/myspace/myubuntu:v2	
+	harbor(港口)
+		https://goharbor.io/
+		1.提供web管理界面
+		2.支持水平扩展(集群)
+		3.支持权限访问控制(RABC)
+		下载地址
+			https://github.com/goharbor/harbor/releases
+		安装 https://baijiahao.baidu.com/s?id=1708996113470887345&wfr=spider&for=pc
+			tar -zxvf harbor-offline-installer-v2.5.0.tgz 
+			修改配置
+				vi harbor.yml
+					hostname: 192.168.88.19
+					port: 6666
+			初始化,每次修改完配置文件后都需要运行
+				./prepare
+				./install.sh
+			停止服务： docker-compose stop
+			开始服务： docker-compose start
+			重启服务：docker-compose restart
+			停止服务并删除容器：docker-compose down
+			启动服务并运行容器：docker-compose up
 mysql安装
 	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql/conf.d -v mysqllog:/var/logs/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	
 	查看字符集 show variables like '%char%';  在my.cnf设置utf8字符集
