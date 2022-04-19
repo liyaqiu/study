@@ -74,6 +74,7 @@ docker安装
 			docker logout 
 		登录第三方仓库	
 			docker login --username=tb2603639_11 registry.cn-hangzhou.aliyuncs.com 
+			docker login -u eric -p Eric123456 192.168.88.12:86
 			docker logout registry.cn-hangzhou.aliyuncs.com 
 	启动类命令
 		docker --help  
@@ -438,7 +439,7 @@ networks: #声明网络（默认为bridge模式）
 		client	
 			配置
 				mkdir -p /etc/docker
-				tee /etc/docker/daemon.json <-'EOF'
+				tee /etc/docker/daemon.json <<-'EOF'
 				{
 				  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
 				  "insecure-registries": ["192.168.88.19:5000,192.168.88.19:6000"]
@@ -454,26 +455,58 @@ networks: #声明网络（默认为bridge模式）
 			拉取
 				docker pull 192.168.88.19:5000/myspace/myubuntu:v2	
 	harbor(港口)
-		https://goharbor.io/
-		1.提供web管理界面
-		2.支持水平扩展(集群)
-		3.支持权限访问控制(RABC)
-		下载地址
-			https://github.com/goharbor/harbor/releases
-		安装 https://baijiahao.baidu.com/s?id=1708996113470887345&wfr=spider&for=pc
-			tar -zxvf harbor-offline-installer-v2.5.0.tgz 
-			修改配置
-				vi harbor.yml
-					hostname: 192.168.88.19
-					port: 6666
-			初始化,每次修改完配置文件后都需要运行
-				./prepare
-				./install.sh
-			停止服务： docker-compose stop
-			开始服务： docker-compose start
-			重启服务：docker-compose restart
-			停止服务并删除容器：docker-compose down
-			启动服务并运行容器：docker-compose up
+		server
+			https://goharbor.io/
+			1.提供web管理界面
+			2.支持水平扩展(集群)
+			3.支持权限访问控制(RABC)
+			下载地址
+				https://github.com/goharbor/harbor/releases
+				wget https://github.com/goharbor/harbor/releases/download/v1.9.2/harbor-offline-installer-v1.9.2.tgz
+			安装docker-compose
+				下载
+					curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+					chmod +x /usr/local/bin/docker-compose && ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose && docker-compose -version	
+				卸载
+					rm -rf /usr/local/bin/docker-compose /usr/bin/docker-compose
+			安装
+				tar -zxvf harbor-offline-installer-v1.9.2.tgz	
+				修改配置
+					vi harbor/harbor.yml
+						hostname: 192.168.88.19
+						port: 85 注意:(6666部分端口可能被浏览器保留导致无法访问)
+				初始化,每次修改完配置文件后都需要运行
+					./prepare && ./install.sh
+				停止服务： docker-compose stop
+				开始服务： docker-compose start
+				重启服务：docker-compose restart
+				停止服务并删除容器：docker-compose down
+				启动服务并运行容器：docker-compose up
+			访问UI
+				https://192.168.88.19:86
+				用户名密码 admin/Harbor12345
+				用户名密码 eric/Eric123456
+		client
+			配置
+				mkdir -p /etc/docker
+				tee /etc/docker/daemon.json <<-'EOF'
+				{
+				  "registry-mirrors": ["https://lrlaxcij.mirror.aliyuncs.com"],
+				  "insecure-registries": ["192.168.88.12:86"]
+				}
+				EOF
+				systemctl daemon-reload && systemctl restart docker 
+			查看仓库
+				curl -XGET http://192.168.88.19:5000/v2/_catalog	
+				
+			推送
+				docker tag mysql:5.7.25 192.168.88.12:86/zms/mysql:5.7.25
+				docker push 192.168.88.12:86/zms/mysql:5.7.25
+			拉取
+				docker pull 192.168.88.12:86/zms/mysql:5.7.25
+			登录第三方仓库	
+			docker login -u eric -p Eric123456 192.168.88.12:86
+			docker logout 192.168.88.12:86
 mysql安装
 	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql/conf.d -v mysqllog:/var/logs/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	
 	查看字符集 show variables like '%char%';  在my.cnf设置utf8字符集

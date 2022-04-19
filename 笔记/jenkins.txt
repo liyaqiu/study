@@ -1,13 +1,12 @@
 node0 mysql
 node1
-node2
+node2 harbor
 node3 sonarqube	
 node4 nexus	
 node5 gitlab
 node6 jenkins
 node7 测试服务器
 node8 生产服务器
-node9 harbor
 
 
 
@@ -80,10 +79,10 @@ newnode3 k8s-node2
 					sonar.jdbc.password=123456
 					sonar.jdbc.url=jdbc:mysql://192.168.88.10:3306/sonar
 					sonar.web.port=9000
-			su sonar sonarqube-7.0/bin/linux-x86-64/sonar.sh start
-			su sonar sonarqube-7.0/bin/linux-x86-64/sonar.sh status
-			su sonar sonarqube-7.0/bin/linux-x86-64/sonar.sh stop
-			tail -f sonarqube-7.0/logs/web.log 
+			su sonar /usr/local/sonarqube-7.0/bin/linux-x86-64/sonar.sh restart
+			su sonar /usr/local/sonarqube-7.0/bin/linux-x86-64/sonar.sh status
+			su sonar /usr/local/sonarqube-7.0/bin/linux-x86-64/sonar.sh stop
+			tail -f /usr/local/sonarqube-7.0/logs/web.log 
 			UI访问
 				http://192.168.88.13:9000
 				用户密码admin/admin

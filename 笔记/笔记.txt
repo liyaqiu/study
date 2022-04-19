@@ -37,7 +37,7 @@ https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
 
 
 
-jenkins  https://www.bilibili.com/video/BV1kJ411p7mV?p=35&spm_id_from=pageDriver
+jenkins  https://www.bilibili.com/video/BV1kJ411p7mV?p=52
 
 
 云原生  https://www.bilibili.com/video/av718216771?from=search&seid=13465110830627937400&spm_id_from=333.337.0.0
