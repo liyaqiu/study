@@ -19,6 +19,10 @@
 		. /etc/profile
 
 
+常用命令
+	mvn -s /root/apache-maven-3.8.5/conf/settings.xml  -DskipTests=true clean install dockerfile:build  调用dockerfile插件打包镜像
+	mvn -f ${project_path} -s /root/apache-maven-3.8.5/conf/settings.xml  -DskipTests=true clean install  指定子项目进行打包
+		
 
 依赖传递作用域
 	同pom 

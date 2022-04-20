@@ -5,8 +5,8 @@ node3 sonarqube
 node4 nexus	
 node5 gitlab
 node6 jenkins
-node7 测试服务器
-node8 生产服务器
+node7 生产服务器
+node8 测试服务器
 
 
 
@@ -170,6 +170,7 @@ newnode3 k8s-node2
 			实现gitlab钩子触发器构建项目
 		邮件插件(Email Extension Template)
 		sonarqube插件(SonarQube Scanner)
+		远程调用插件(Publish Over SSH)
 	常用项目构建
 		自由风格构建 FreeStyle Project
 		Maven构建 Maven Project
@@ -263,11 +264,26 @@ newnode3 k8s-node2
 				sonar.java.target=1.8
 				sonar.sourceEncoding=UTF-8
 
-		
-		
-		
-		
-		
+	远程调用整合
+		需要jenkins机器免密到node机器
+			把jenkins机器的公钥拷贝到node机器
+				ssh-copy-id -i ~/.ssh/id_rsa.pub root@192.168.88.18
+			测试登陆
+				ssh 192.168.88.18
+		Dashboard > Configure System > Publish over SSH
+			Path to key = /root/.ssh/id_rsa
+		Dashboard > Configure System > Publish over SSH > SSH Servers
+			Name = test-server
+			Hostname = 192.168.88.18
+			Username = root
+			Remote Directory = /
+		配置pipeline代码
+			http://192.168.88.16:8899/job/parent/pipeline-syntax/
+			片段生成器 > sshPublisher
+		后端docker镜像部署思路
+			通过ssh来执行node上的deploy.sh
+		前端nginx部署思路
+			通过scp 来做文件拷贝
 		
 		
 		

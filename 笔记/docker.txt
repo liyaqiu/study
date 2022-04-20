@@ -483,7 +483,7 @@ networks: #声明网络（默认为bridge模式）
 				停止服务并删除容器：docker-compose down
 				启动服务并运行容器：docker-compose up
 			访问UI
-				https://192.168.88.19:86
+				http://192.168.88.12:86/
 				用户名密码 admin/Harbor12345
 				用户名密码 eric/Eric123456
 		client
@@ -496,17 +496,14 @@ networks: #声明网络（默认为bridge模式）
 				}
 				EOF
 				systemctl daemon-reload && systemctl restart docker 
-			查看仓库
-				curl -XGET http://192.168.88.19:5000/v2/_catalog	
-				
 			推送
 				docker tag mysql:5.7.25 192.168.88.12:86/zms/mysql:5.7.25
 				docker push 192.168.88.12:86/zms/mysql:5.7.25
 			拉取
 				docker pull 192.168.88.12:86/zms/mysql:5.7.25
 			登录第三方仓库	
-			docker login -u eric -p Eric123456 192.168.88.12:86
-			docker logout 192.168.88.12:86
+				docker login -u eric -p Eric123456 192.168.88.12:86
+				docker logout 192.168.88.12:86
 mysql安装
 	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql/conf.d -v mysqllog:/var/logs/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	
 	查看字符集 show variables like '%char%';  在my.cnf设置utf8字符集
