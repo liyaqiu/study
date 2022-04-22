@@ -22,8 +22,14 @@
 常用命令
 	mvn -s /root/apache-maven-3.8.5/conf/settings.xml  -DskipTests=true clean install dockerfile:build  调用dockerfile插件打包镜像
 	mvn -f ${project_path} -s /root/apache-maven-3.8.5/conf/settings.xml  -DskipTests=true clean install  指定子项目进行打包
-		
+	mvn -s D:\apache-maven-3.6.3\conf\settings.xml clean package -P jenkins-pro-config 指定配置文件
+	mvn -f son1 -s /root/apache-maven-3.8.5/conf/settings.xml clean install -P jenkins-pro-config
 
+	mvn -f son1 -s /root/apache-maven-3.8.5/conf/settings.xml clean install -P jenkins-dev-config
+	
+	mvn  -s /root/apache-maven-3.8.5/conf/settings.xml clean install 
+	mvn -f son1 -s /root/apache-maven-3.8.5/conf/settings.xml clean install -P jenkins-dev-config
+	mvn -s /root/apache-maven-3.8.5/conf/settings.xml clean install
 依赖传递作用域
 	同pom 
 		后者覆盖前者

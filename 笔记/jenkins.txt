@@ -1,12 +1,13 @@
-node0 mysql
+1node0 mysql
 node1
 node2 harbor
 node3 sonarqube	
 node4 nexus	
 node5 gitlab
-node6 jenkins
+node6 jenkins master
 node7 生产服务器
 node8 测试服务器
+node9 jenkins slave1
 
 
 
@@ -171,6 +172,7 @@ newnode3 k8s-node2
 		邮件插件(Email Extension Template)
 		sonarqube插件(SonarQube Scanner)
 		远程调用插件(Publish Over SSH)
+		多选框参数插件(Extended Choice ParameterVersion)
 	常用项目构建
 		自由风格构建 FreeStyle Project
 		Maven构建 Maven Project
@@ -281,11 +283,22 @@ newnode3 k8s-node2
 			http://192.168.88.16:8899/job/parent/pipeline-syntax/
 			片段生成器 > sshPublisher
 		后端docker镜像部署思路
-			通过ssh来执行node上的deploy.sh
+			通过【远程调用插件】来执行node上的deploy.sh
 		前端nginx部署思路
-			通过scp 来做文件拷贝
+			通过【远程调用插件】来做目录文件拷贝
 		
-		
-		
+	jenkins主从	
+		Dashboard > Configure Global Security > Agents
+			TCP port for inbound agents = Random
+		Dashboard > Nodes > Manage nodes and clouds > New Node
+			Remote root directory = /root/jenkins_slave1
+			Custom WorkDir path = /root/jenkins_slave1
+		点击节点可以获取运行jar包
+			java -jar agent.jar -jnlpUrl http://192.168.88.16:8899/computer/slave1/jenkins-agent.jnlp -secret f8abe479bcb163d690d7465ee14c523422194f36d2d959c845fb0927d0533602 -workDir "/root/jenkins_slave1"
+			
+		freestyle项目运行
+			Dashboard > slave1-test > Restrict where this project can be run
+					Label Expression = slave1
+
 		
 		
