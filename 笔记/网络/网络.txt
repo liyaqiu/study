@@ -18,6 +18,7 @@ VRP中端命令
 			display router id 查看路由id
 			display arp 查看arp表
 			display ip routing-table 192.168.88.0 查看单个网络地址的路由信息
+			display mac-address 查看mac表地址
 			shutdown 停掉接口
 			undo shutdown 恢复接口
 			开启远程管理
@@ -39,7 +40,84 @@ VRP中端命令
 			undo ip address 取消命令
 	协议视图
 		ospf 10 进入到协议视图
-		
+
+
+交换机
+	mac地址表:
+		可以通过自动学习获取
+		mac地址表(动态数据)老化时间为5分钟
+	工作方式:
+		可以进行端口协商，向下兼容
+		可以实现定向转发
+		单播mac
+			查看mac地址表
+				不存在
+					直接泛洪
+				存在
+					直接转发
+		广播mac
+			直接泛洪
+	
+	vlan虚拟局域网:
+		使用vlan解决广播域的问题
+		帧格式:
+			【D.MAC|S.MAC|Tag|Type|Data|FCS】
+			Tag【TPID|PRI|CFI|VLAN ID】
+				TPID 协议类型
+				PRI 优先级，QOS需要用到
+				CFI 是否经典 以太网经典(值为0)，非以太网不经典
+				VLAN ID 12位，0-4095，可用为1-4094，0和4095保留
+		重要的理论概念
+			pvid 指的是交换机每个端口的port vlan id值，不修改，默认为1
+			vid 指的是协议包tag里面的vlan id值
+		端口类型
+			access
+				访问流程
+					发送端
+						准备发送报文,剥离Tag,发送				
+					接收端
+						接收到报文
+							带Tag
+								VID与PVID相同，接收，进一步处理
+								VID与PVID不相同，丢弃
+							不带Tag
+								接收并打上PVID，进一步处理
+				int g0/0/3 进入接口
+				port link-type access 修改链路类型
+				port default vlan 10 修改了默认的pvid，默认pvid为1
+				display this 查看当前配置
+				
+			trunk
+				发送端
+					准备发送报文
+						VID与PVID相同
+							剥离Tag,发送			
+						VID与PVID不相同
+							保持原有Tag,发送
+				接收端
+					接收到报文
+						带Tag
+							VID是否允许通过(allow-pass)
+								如果在则通过，并且接收，并行下一步处理 
+								不在则丢弃
+							VID与PVID不相同，丢弃
+						不带Tag
+							给数据加上Tag,并且给VID打上PVID
+								VID是否允许通过(allow-pass)
+									如果在则通过，并且接收，并行下一步处理 
+									不在则丢弃
+				int g0/0/1 进入接口
+				port link-type trunk 修改链路类型
+				port trunk allow-pass vlan 10 20 指定放行的VID，默认只放行VID 1(可以undo port trunk allow-pass vlan 1关闭)
+				port trunk allow-pass vlan all 放行所有的VID
+				port trunk pvid vlan 40 修改了默认的pvid，默认pvid为1
+				display this 查看当前配置
+			hybrid(默认为hybrid)
+			qinq
+	display mac-address 查看mac表地址	
+	display vlan  查看vlan
+	vlan 10 创建vlan
+	vlan batch 10 20 同时创建多个vlan
 路由器
 	路由加表
 		原则:保证下一跳地址能够通过路由表的某个出接口可达	
@@ -129,22 +207,48 @@ VRP中端命令
 						骨干区域:区域0，ospf必须要有的区域
 						非骨干区域: 非0的区域
 					7种状态和5种报文类型	
-						Down状态 | Init状态 | 2-way状态
-							Hello报文---建立邻居关系
-						-------------------建立邻居关系------------------
-						Exstart状态 | Exchange
-							DD(Database Description)报文---选举以及同步摘要信息
-						Loading状态 | Full状态 
-							LSR(Link State Request)报文
-							LSU(Link State Update)报文
-							LSACK(Link State Acknowledgment)报文
+						Down状态
+							Hello报文(组播)
+						Init状态 
+							Hello报文(组播)
+								收到对方的Hello报文，但没里面没有我的Router id
+						2-way状态
+							Hello报文(组播)
+								收到对方的Hello报文，里面有我的Router id		
+						-------------------建立邻居关系------------------	
+						DR(Designated Router)和BDR(Backup Designated Router)建立，目的是为了解决同一广播域多态设备之间的泛洪
+							数据同步
+								DR和BDR之间也会进行数据同步
+								DRO(Designated Router Other)会和DR BDR都进行数据同步
+							选举过程
+								冷启动(40秒选举时间)
+									先选举出BDR，如果AS里面没有DR，则由BDR升级位DR
+										Router Priority: 1 (1-255)默认为1，0为不参与DR，BDR选举
+										如果Priority相同，则根据Router id选，Router id最大则为DR
+								热启动
+									就算优先级在大也无法成为DR，只能重启OSPF服务
+						Exstart状态
+							DD(Database Description)报文(单播)
+								主从选举(Router id大为主)
+						Exchange状态
+							DD(Database Description)报文(单播)
+								同步摘要信息
+						Loading状态
+							LSR(Link State Request)报文(单播)
+								缺少LSR摘要信息求情
+							LSU(Link State Update)报文(单播)
+								缺少的LSR详细信息回复
+							LSACK(Link State Acknowledgment)报文(单播)
+								缺少的LSR摘要信息确认
+						Full状态 
 						-------------------建立邻接关系------------------		
 					命令:
 						协议视图
+							display ip routing-table 查看路由表
 							R1
 								ospf 10 router-id 1.1.1.1 创建ofps服务.并且进入协议视图、
 									area 0 进入骨干区域，正式开始OSPF
-										网络宣告
+										网络宣告(开始整个ospf的过程)
 											区域下宣告
 												network 12.1.1.0 0.0.0.255 宣告接口地址以及反掩码(255.255.255.255-255.255.255.0)
 												undo network 12.1.1.0 0.0.0.255 取消宣告
@@ -156,7 +260,7 @@ VRP中端命令
 							R2
 								ospf 10 router-id 2.2.2.2 创建ofps服务.并且进入协议视图、
 									area 0 进入骨干区域，正式开始OSPF
-										网络宣告
+										网络宣告(开始整个ospf的过程)
 											区域下宣告
 												network 12.1.1.0 0.0.0.255 宣告接口地址以及反掩码(255.255.255.255-255.255.255.0)
 												undo network 12.1.1.0 0.0.0.255 取消宣告
@@ -165,11 +269,20 @@ VRP中端命令
 												ospf enable 10 area 0 宣告
 												undo ospf enable 10 area 0 取消宣告
 												display this 查看宣告信息
-												
-							ospf 10 router-id 1.1.1.2 覆盖router-id，但是需要重启ospf
-							display ospf peer 显示零距节点信息
-							display ospf peer brief 显示零距节点信息							
-							undo ospf 10 删除ospf
+								ospf 11 router-id 3.3.3.3
+									area 0
+										network 23.1.1.0 0.0.0.255 
+							R3
+								ospf 11 router-id 4.4.4.4
+									area 0
+										network 23.1.1.0 0.0.0.255 
+							状态信息查看
+								display ospf peer 显示邻居节点信息
+								display ospf peer brief 显示邻居节点信息		
+								display ospf interface g0/0/0 查看接口的宣告信息
+							修改或者删除
+								ospf 10 router-id 1.1.1.2 覆盖router-id，但是需要重启ospf
+								undo ospf 10 删除ospf
 						用户视图	
 							reset ospf proces
 							
@@ -177,6 +290,7 @@ VRP中端命令
 			EGP协议-外部网关路由协议 AS间:
 				BGP协议
 
+				
 OSI-7层模型
 7.应用层
 	应用层协议
@@ -230,12 +344,14 @@ OSI-7层模型
 				完整IP数据报的理论最大大小为64 KB，但只能保证路由576个字节。在任何给定的网络路径上，最大传输单元最小的链路将确定实际限制。 (1500个字节，较少的标头是常见的最大值，但无法预测会有多少个标头，因此将消息限制在1400个字节左右是最安全的。)
 				如果超过MTU限制，则IPv4会自动将数据报分解为片段，并在末尾重新组装它们，但只有在所有片段都能通过的情况下，才最多64 KB。如果丢失了任何片段，或者如果任何设备确定它不喜欢片段，则整个数据包都会丢失。
 3.网络层
+	设备:
+		路由器
 	作用:
-		1.从全局定位某一台设备(IP地址)
-		2.路由
+		从全局定位某一台设备(IP地址)
+		路由
 	无法实现:
-		1.纠错(对错误的改正)
-		2.无法实现一个设备不同应用的区分
+		纠错(对错误的改正)
+		无法实现一个设备不同应用的区分
 	报头:打上包头就叫 数据包Packet
 	--------------------------网络层层相关知识----------------------------------
 	IP协议
@@ -283,6 +399,10 @@ OSI-7层模型
 			arp 网络地址解析协议
 				【E2 header|ARP】
 				【sender-ip|sender-mac|target-ip|target-mac】
+				路由器
+					ARP表(动态数据)老化时间：思科是 5分钟，华为是 20分钟
+				个人PC
+					ARP表(动态数据)老化时间：20分钟
 	IP地址
 		A类(单播地址,可以设备配置)
 			最小:0.0.0.0
@@ -310,7 +430,7 @@ OSI-7层模型
 					
 			127.0.0.0 不可用127.0.0.0 - 127.255.255.255	
 				作用:
-					用于测试设备内部TCP/IP协议栈使用，早起有很多协议栈例如IPX协议栈，那么他就识别不了Ping命令		
+					用于测试设备内部TCP/IP协议栈使用，早期有很多协议栈例如IPX协议栈，那么他就识别不了Ping命令		
 	公网
 		公网地址:全世界唯一性
 	私网
@@ -349,12 +469,15 @@ OSI-7层模型
 			10.88.0.0/21 通告超网地址
 		
 2.数据链路层
+	设备:
+		网桥(mac地址表)
+		交换机(mac地址表)		
 	作用:
-		1.差错检测
-		2.提供链路上的地址信息(mac地址)
+		差错检测
+		提供链路上的地址信息(mac地址)
 	无法实现:
-		1.纠错(对错误的改正)
-		2.无法从全局的角度分析地址信息
+		纠错(对错误的改正)
+		无法从全局的角度分析地址信息
 	报头:打上包头就叫 数据帧Frame
 	--------------------------数据链路层相关知识----------------------------------		
 	通信协议
@@ -428,13 +551,14 @@ OSI-7层模型
 				将数据进行CRC校验，比如帧尾值(FCS),如果不同丢弃，否则下一步
 				查看type字段，交由type字段标识的上层协议处理			
 1.物理层
-	作用:
-		1.规范传输介质的标准
-			双绞线
-			光钎线
-			无线
+	传输介质:
+		双绞线
+		光钎线
+		无线
+		中继器(信号放大器)
+		集线器/多口中继器(hub),会泛洪，把数据全部发给不同的口
 	无法实现: 
-		1.差错检测
+		差错检测
 
 		
 		
