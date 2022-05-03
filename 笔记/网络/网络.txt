@@ -4,292 +4,6 @@ TCP/IP协议栈
 2.网络层
 1.网络接口层
 
-
-VRP中端命令
-	用户视图
-		telnet 192.168.88.1
-		display arp 查看arp信息
-	系统视图
-		system-view  用户视图切换到系统视图
-			sysname R1 更改设备名字
-			display ip interface brief 查看接口地址
-			display current-configuration 查看当前设备的配置
-			display ip routing-table 查看路由表
-			display router id 查看路由id
-			display arp 查看arp表
-			display ip routing-table 192.168.88.0 查看单个网络地址的路由信息
-			display mac-address 查看mac表地址
-			shutdown 停掉接口
-			undo shutdown 恢复接口
-			开启远程管理
-				user-interface vty 0 4 设置最多4个人同时可以进行远程管理
-					authentication-mode password 配置密码
-					user privilege level 3 设置权限级别为3 取值1-3
-					display this 查看当前等级信息
-			配置换回接口
-				好处:
-					逻辑接口，用不宕机
-				interface LoopBack 0 
-				ip address 10.0.0.1 32
-				display ip interface brief
-	接口视图
-		interface Ethernet 0/0/1  进入到接口视图
-			ip address 192.168.88.8 24
-			ip address 192.168.88.2 255.255.255.0
-			display this 显示当前接口的ip地址
-			undo ip address 取消命令
-	协议视图
-		ospf 10 进入到协议视图
-
-
-交换机
-	mac地址表:
-		可以通过自动学习获取
-		mac地址表(动态数据)老化时间为5分钟
-	工作方式:
-		可以进行端口协商，向下兼容
-		可以实现定向转发
-		单播mac
-			查看mac地址表
-				不存在
-					直接泛洪
-				存在
-					直接转发
-		广播mac
-			直接泛洪
-	
-	vlan虚拟局域网:
-		使用vlan解决广播域的问题
-		帧格式:
-			【D.MAC|S.MAC|Tag|Type|Data|FCS】
-			Tag【TPID|PRI|CFI|VLAN ID】
-				TPID 协议类型
-				PRI 优先级，QOS需要用到
-				CFI 是否经典 以太网经典(值为0)，非以太网不经典
-				VLAN ID 12位，0-4095，可用为1-4094，0和4095保留
-		重要的理论概念
-			pvid 指的是交换机每个端口的port vlan id值，不修改，默认为1
-			vid 指的是协议包tag里面的vlan id值
-		端口类型
-			access
-				访问流程
-					发送端
-						准备发送报文,剥离Tag,发送				
-					接收端
-						接收到报文
-							带Tag
-								VID与PVID相同，接收，进一步处理
-								VID与PVID不相同，丢弃
-							不带Tag
-								接收并打上PVID，进一步处理
-				int g0/0/3 进入接口
-				port link-type access 修改链路类型
-				port default vlan 10 修改了默认的pvid，默认pvid为1
-				display this 查看当前配置
-				
-			trunk
-				发送端
-					准备发送报文
-						VID与PVID相同
-							剥离Tag,发送			
-						VID与PVID不相同
-							保持原有Tag,发送
-				接收端
-					接收到报文
-						带Tag
-							VID是否允许通过(allow-pass)
-								如果在则通过，并且接收，并行下一步处理 
-								不在则丢弃
-							VID与PVID不相同，丢弃
-						不带Tag
-							给数据加上Tag,并且给VID打上PVID
-								VID是否允许通过(allow-pass)
-									如果在则通过，并且接收，并行下一步处理 
-									不在则丢弃
-				int g0/0/1 进入接口
-				port link-type trunk 修改链路类型
-				port trunk allow-pass vlan 10 20 指定放行的VID，默认只放行VID 1(可以undo port trunk allow-pass vlan 1关闭)
-				port trunk allow-pass vlan all 放行所有的VID
-				port trunk pvid vlan 40 修改了默认的pvid，默认pvid为1
-				display this 查看当前配置
-			hybrid(默认为hybrid)
-			qinq
-	display mac-address 查看mac表地址	
-	display vlan  查看vlan
-	vlan 10 创建vlan
-	vlan batch 10 20 同时创建多个vlan
-路由器
-	路由加表
-		原则:保证下一跳地址能够通过路由表的某个出接口可达	
-		目标网络地址一致+子网掩码一致【优先级越小就会进行加表】
-			(Pre/Cost越小越优先)
-			直连路由 Pre 0
-			静态路由 Pre 60
-			当 Pre 相同比较Cost值	
-		目标网络地址一致+子网掩码不一致【都会进行加表】
-			子网掩码越大(长)，优先级越高
-			0.0.0.0/0 默认路由优先级最低，当都匹配不上才会匹配到默认路由						
-	默认路由表
-		网段路由(子网掩码8-30)
-			127.0.0.0/8 - 127.0.0.0/30 常见的8-30  31掩码，那么地址不够没实际意义
-				127.0.0.0/0 - 127.0.0.0/31 不可能出现，因为A类地掩码默认是8
-		主机路由/精确路由(子网掩码32)
-			127.0.0.1/32
-			127.255.255.255/32
-			255.255.255.255/32
-		
-	路由表的形成
-		直连路由 根据本网段的物理接口信息生成的，无法进行非直连的通讯
-			默认生成
-				网段路由
-					192.168.88.0/24
-				主机路由
-					192.168.88.1/32 
-					192.168.88.255/32
-	
-		静态路由 
-			系统视图下配置
-				display ip routing-table 查看路由表
-				ip route-static 0.0.0.0 0 12.1.1.2 配置静态路由
-				undo ip route-static 0.0.0.0 0 12.1.1.2 取消静态路由配置
-
-				R1
-				ip route-static 192.168.89.0 24 12.1.1.2
-				ip route-static 192.168.90.0 24 12.1.1.2
-				R2
-				ip route-static 192.168.88.0 24 12.1.1.1
-				ip route-static 192.168.90.0 24 23.1.1.3
-				R3
-				ip route-static 192.168.88.0 24 23.1.1.2
-				ip route-static 192.168.89.0 24 23.1.1.2
-			浮动静态路由
-				浮动静态路由可以实现路由的备份
-					display ip interface brief 查看接口地址
-					display current-configuration 查看当前设备的配置
-					display ip routing-table 查看路由表
-					电信
-						lo ip address 123.1.1.1 24
-						ip address 10.1.1.1 24
-					移动
-						lo ip address 123.1.1.1 24
-						ip address 20.1.1.1 24
-					网关
-						ip address 10.1.1.2 24
-						ip address 20.1.1.2 24		
-						
-						shutdown以后可以实现主备切换
-						ip route-static 123.1.1.0 24 10.1.1.1 preference 80
-						ip route-static 123.1.1.0 24 20.1.1.1 preference 70	
-		动态路由 	
-			AS自治系统(由1个或多个设备【路由器】组成的AS系统)
-				公有AS
-					电信，网通，移动，需要经过认证申请
-				私有AS
-					公司内网搭建的，或者家用，不需要经过验证申请
-			通过在设备运行某种协议，并且通过这种协议自动交互路由信息
-			IGP协议-内部网关路由协议 AS内:
-				RIP协议是一种基于距离矢量算法的路由协议，存在着收敛慢，易产生路由环路，可扩展性差等问题，已经被OSPF取代
-					距离矢量算法:
-						特点:只知道路由的传递，但不知道路由具体的始发信息
-						功能:查看是否能加表，可以加表则往下传递(传递给相邻设备)，不能加表则不传递
-				OSPF协议(Open Shortest Path First 开放式最短路径优先)是IETF定义的一种基于【链路状态的内部网关路由协议】
-					链路状态算法:
-						特点:每台路由器能独立的通过计算产生最短路径
-						LSA:链路状态通告	
-						LSDB:链路状态数据库
-						功能:
-							1.建立邻居/邻接关系--存放在邻居表	
-							2.同步LSA，构建完LSDB--存放在LSDB数据库	
-							3.SPF算法计算路由--存放在路由表
-					区域号:
-						区域号相同，则为相同区域
-						LSA做同步前提条件，必须在相同区域中才能同步
-						骨干区域:区域0，ospf必须要有的区域
-						非骨干区域: 非0的区域
-					7种状态和5种报文类型	
-						Down状态
-							Hello报文(组播)
-						Init状态 
-							Hello报文(组播)
-								收到对方的Hello报文，但没里面没有我的Router id
-						2-way状态
-							Hello报文(组播)
-								收到对方的Hello报文，里面有我的Router id		
-						-------------------建立邻居关系------------------	
-						DR(Designated Router)和BDR(Backup Designated Router)建立，目的是为了解决同一广播域多态设备之间的泛洪
-							数据同步
-								DR和BDR之间也会进行数据同步
-								DRO(Designated Router Other)会和DR BDR都进行数据同步
-							选举过程
-								冷启动(40秒选举时间)
-									先选举出BDR，如果AS里面没有DR，则由BDR升级位DR
-										Router Priority: 1 (1-255)默认为1，0为不参与DR，BDR选举
-										如果Priority相同，则根据Router id选，Router id最大则为DR
-								热启动
-									就算优先级在大也无法成为DR，只能重启OSPF服务
-						Exstart状态
-							DD(Database Description)报文(单播)
-								主从选举(Router id大为主)
-						Exchange状态
-							DD(Database Description)报文(单播)
-								同步摘要信息
-						Loading状态
-							LSR(Link State Request)报文(单播)
-								缺少LSR摘要信息求情
-							LSU(Link State Update)报文(单播)
-								缺少的LSR详细信息回复
-							LSACK(Link State Acknowledgment)报文(单播)
-								缺少的LSR摘要信息确认
-						Full状态 
-						-------------------建立邻接关系------------------		
-					命令:
-						协议视图
-							display ip routing-table 查看路由表
-							R1
-								ospf 10 router-id 1.1.1.1 创建ofps服务.并且进入协议视图、
-									area 0 进入骨干区域，正式开始OSPF
-										网络宣告(开始整个ospf的过程)
-											区域下宣告
-												network 12.1.1.0 0.0.0.255 宣告接口地址以及反掩码(255.255.255.255-255.255.255.0)
-												undo network 12.1.1.0 0.0.0.255 取消宣告
-												display this 查看宣告信息
-											接口下宣告
-												ospf enable 10 area 0 宣告
-												undo ospf enable 10 area 0 取消宣告
-												display this 查看宣告信息
-							R2
-								ospf 10 router-id 2.2.2.2 创建ofps服务.并且进入协议视图、
-									area 0 进入骨干区域，正式开始OSPF
-										网络宣告(开始整个ospf的过程)
-											区域下宣告
-												network 12.1.1.0 0.0.0.255 宣告接口地址以及反掩码(255.255.255.255-255.255.255.0)
-												undo network 12.1.1.0 0.0.0.255 取消宣告
-												display this 查看宣告信息
-											接口下宣告
-												ospf enable 10 area 0 宣告
-												undo ospf enable 10 area 0 取消宣告
-												display this 查看宣告信息
-								ospf 11 router-id 3.3.3.3
-									area 0
-										network 23.1.1.0 0.0.0.255 
-							R3
-								ospf 11 router-id 4.4.4.4
-									area 0
-										network 23.1.1.0 0.0.0.255 
-							状态信息查看
-								display ospf peer 显示邻居节点信息
-								display ospf peer brief 显示邻居节点信息		
-								display ospf interface g0/0/0 查看接口的宣告信息
-							修改或者删除
-								ospf 10 router-id 1.1.1.2 覆盖router-id，但是需要重启ospf
-								undo ospf 10 删除ospf
-						用户视图	
-							reset ospf proces
-							
-				IS-IS协议
-			EGP协议-外部网关路由协议 AS间:
-				BGP协议
-
 				
 OSI-7层模型
 7.应用层
@@ -425,7 +139,7 @@ OSI-7层模型
 		特殊地址
 			0.0.0.0  不可用0.0.0.0 - 0.255.255.255
 				作用:
-					1.当台机器未指定任何Ip的时候，会用0.0.0.0去找dhcp获取ip地址回来
+					1.当台机器未指定任何Ip的时候，会用0.0.0.0作为S-IP找dhcp获取ip地址回来
 					2.用来做默认路由的地址，0.0.0.0可以表示为全网的所有地址
 					
 			127.0.0.0 不可用127.0.0.0 - 127.255.255.255	
@@ -509,10 +223,13 @@ OSI-7层模型
 				SNAP(公有协议不会激活此字段)
 					OrgCode 标识厂家
 					Type 标识上层协议类型
+			IEEE 802.11
+				无限协议
 		广域网数据帧
 			PPP
 			HDLC
 	mac地址
+		mac地址在一个广播域下不能重复
 		16进制 00-50-56-C0-00-08
 		每一个数字就是1个16进制,转换为2进制的时候，只对应4位
 			例如 00-50
@@ -560,9 +277,7 @@ OSI-7层模型
 	无法实现: 
 		差错检测
 
-		
-		
-IP地址113.86.152.178
+
 		
 理论知识
 	最小网络组成
