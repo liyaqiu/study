@@ -9,6 +9,9 @@
 			直连路由 Pre 0
 			静态路由 Pre 60
 			当 Pre 相同比较Cost值	
+				Cost值=参考带宽/接口带宽
+					当值小于1，则为1，0.1=1
+					当值大于1，则取整，2.9=2
 		目标网络地址一致+子网掩码不一致【都会进行加表】
 			子网掩码越大(长)，优先级越高
 			0.0.0.0/0 默认路由优先级最低，当都匹配不上才会匹配到默认路由						
@@ -109,15 +112,86 @@
 						最多有效跳数为15，环形组网中，使远端路由不可达
 						以"跳数"为度量，存在选择次优路径风险
 				OSPF协议(Open Shortest Path First 开放式最短路径优先)是IETF定义的一种基于【链路状态的内部网关路由协议】
-					报文解释:
-						Version：用于描述当前OSPF协议版本
-						Massage Type:用于描述当前OSPF报文的类型
-						Source OSPF Router:用于描述发送该Hello报文的路由器的Router ID
-						Area ID:用于描述OSPF区域
 					相对RIP的优点:
 						以COST计算次优路径
 						收敛快，先番泛洪后计算
 						没有跳数限制
+					报文解释:
+						Version：用于描述当前OSPF协议版本
+						Massage Type:用于描述当前OSPF报文的类型
+						Source OSPF Router:用于描述发送该Hello报文的路由器的Router ID
+						Area ID:用于描述发送该OSPF报文的接口在哪个区域
+						Checksum:校验和，用于保证报文的完整性
+						Auth Type:认证类型,Null为空
+						Autho Data:认证数据
+							Network Mask:用于描述发送该Hello报文路由器的接口掩码长度
+							Hello Interval:用于描述自神Hello报文发送的时间间隔
+							OPtions:可选项,OSPF零距建立的时候需要满足Ebit和Nbit一致
+							Router Priority:用于发送该OSPF报文接口的DR优先级
+							Router Dead Interval:用于描述邻居的失效时间
+							DR:指定路由器,取值为该接口地址
+							BDR:备份指定路由器,取值为该链路上的BDR接口地址
+					OSPF邻居建立的条件
+						1版本一致
+						2RouterID不能冲突
+						3区域ID一致
+						4认证类型和认证密码一致
+						5两端接口IP要求在同网段
+						6两端接口掩码要求相同
+						7Hello发送时间间隔一致
+						8Dead时间一致
+						9Option选项中Nbit和Ebit需要一致
+						10双方接口的MTU一致
+					OSPF网络类型
+						p2p
+						p2mp
+						broadcast
+						nbma
+					OSPF LSDB		
+						LSA类型(11种)
+							Router-LSA = 1类
+								在一个区域内部，每个OSPF路由器都会产生一条一类的LSA描述自身所有接口的链路状态信息
+								在1类LSA中，使用4种链路类型描述接口的链路状态信息
+									link-type: StubNet【叶子】 用于描述直连网络号
+										link-id: 用于描述直接的网络地址
+										data: 用于描述网络掩码信息
+										metric: 用于描述路由器自神去往改网络的COST值
+									link-type: P2P【树干】 用于描述直连链路上网络类型为P2P或者P2MP的邻居
+										link-id: 用于描述P2P网络上邻居的RID
+										data: 用于描述自身链接P2P邻居的接口IP地址
+										metric: 用于描述自身去往邻居的Cost值
+									link-type: TransNet【树干】 用于描述直连链路上网络类型为broadcast或者nbma的邻居
+										link-id: 用于描述为节点的Router-id,使用的是DR的接口IP地址充当
+										data: 用于描述自身去往为节点的接口IP地址
+										metric: 用于描述自身到达为节点的Cost值
+									link-type: V-link【树干】 用于描述虚链路上的OSPF邻居
+										link-id: 用于描述虚链路零距的Router-id
+										data: 用于描述自身去往虚链路邻居的接口IP地址
+										metric: 用于描述自身去往虚链路邻居的Cost值
+							Network-LSA = 2类
+			
+						LSA交互原则
+							相互交换自身没有的LSA，以及使用新的LSA替换旧的LSA
+						LSA唯一性判断
+							LSA类型(Type)
+							LSA链路状态ID(Link State ID)
+							LSA的通告者(Adv Router)
+						LSA的新旧状态判断
+							
+							首先比较的就是LSA的序列号
+								当序列号相同时，比较校验和，越大越优
+									当校验和相同，比较LSA的age时间
+										首先age等于3600s的LAS，用于删除一条LSA
+										如何两条LSA的age时间大于900s，选择age数值小的LSA，如果小于900S，则保持不变
+						LSA更新机制
+							触发更新
+								当链路状态发生改变之后OSPF将会触发更新，如COST变，网段掩码变，取消宣告
+							周期更新
+								每个OSPF路由器每隔30分钟周期更新一次自身产生的LSA，更新的时候将SEQ+1校验和重新计算，age时间重新恢复到初始值
+						LSA老化机制
+							OSPF路由器每产生一条LSA，都会存在一个age时间为3600s，初始值为1，当age时间递增到3600s之后，将会惹味LSA老化，从自身LSDB中删除LSA
+						LSA删除机制
+							当OSPF需要删除一条LSA的时候，将会把LSA的age时间变为3600s，当其他路由器接受到这条LSA之后，将会从LSDB中对应的LSA删除掉
 					链路状态算法:
 						特点:每台路由器能独立的通过计算产生最短路径
 						LSA:链路状态通告	
@@ -141,15 +215,15 @@
 							非骨干区域: 非0区域		
 					5种报文类型	
 						Hello报文:
-							用于协商，维持建立OSPF零距
+							发现和维护邻居关系
 						DD(Database Description)报文:
-							用于交互LSA的摘要信息
+							交互链路状态数据库摘要
 						LSR(Link State Request)报文:
-							用于请求一条LSA
+							请求特定的链路状态信息
 						LSU(Link State Update)报文:
-							用于发送LSA的详细信息
+							发送详细的链路状态信息
 						LSACK(Link State Acknowledgment)报文:
-							用于对接受到的LSA进行确认
+							发送确认报文
 					7种状态	
 						Down状态
 							Hello报文
@@ -179,18 +253,18 @@
 								热启动
 									就算优先级在大也无法成为DR，只能重启OSPF服务
 						Exstart状态
-							DD(Database Description)报文(单播)
-								主从选举(Router id大为主)
+							DD(Database Description)报文
+								发送空DD报文进行主从选举(Router id大为主)
 						Exchange状态
-							DD(Database Description)报文(单播)
-								同步摘要信息
+							DD(Database Description)报文
+								双方开始发送LSA摘要信息
 						Loading状态
-							LSR(Link State Request)报文(单播)
-								缺少LSR摘要信息求情
+							LSR(Link State Request)报文
+								缺少LSA摘要信息求情
 							LSU(Link State Update)报文
-								缺少的LSR详细信息回复
+								缺少的LSA详细信息回复
 							LSACK(Link State Acknowledgment)报文
-								缺少的LSR摘要信息确认
+								缺少的LSA摘要信息确认
 						Full状态 
 						-------------------建立邻接关系------------------		
 					命令:
@@ -202,6 +276,9 @@
 										区域下宣告(开始整个ospf的过程)
 											network 12.1.1.0 0.0.0.255 宣告接口地址以及反掩码(255.255.255.255-255.255.255.0)
 											network 192.168.77.0 0.0.0.255 
+											
+											network 12.1.1.1 0.0.0.0 精确宣告
+											network 12.1.1.0 0.0.0.255 网段宣告
 											network 0.0.0.0 0.0.0.0 宣告全部，可以实现自动宣告功能
 										接口下宣告(开始整个ospf的过程)
 											int g0/0/1
@@ -228,10 +305,17 @@
 							修改或者删除
 								undo ospf 10 删除ospf
 								ospf 10 router-id 1.1.1.2 覆盖router-id，但是重启ospf进程
+									bandwidth-reference 10000 修改cost参考值，建议全部都进行更改
 								int g0/0/0
 									ospf dr-priority 233  修改ospf接口优先级
+									ospf cost 10 修改cost开销值
+									ospf network-type p2p 修改ospf网络类型
 								用户视图	
-									reset ospf proces 重启ospf进程				
+									reset ospf proces 重启ospf进程	
+								display ospf lsdb 查看lsdb	
+									display ospf lsdb [几类lsa] [lsid]
+									display ospf lsdb network 23.1.1.2 查看LSA详细信息
+									display ospf lsdb router 1.1.1.1  查看LSA详细信息
 				IS-IS协议
 			EGP协议-外部网关路由协议 AS间:
 				BGP协议
