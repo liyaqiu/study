@@ -55,6 +55,7 @@ newnode3 k8s-node2
 			root/liyaqiu123456
 		普通用户
 			eric/eric123456
+			liyaqiu/liyaqiu123456
 		
 	Gitlab用户在组里面5种不同角色
 		Guest: 可以创建issue,发表评论，不能读写版本库

@@ -1,39 +1,43 @@
-后端相关
-	要学的
-		云原生 https://www.bilibili.com/video/BV13Q4y1C7hS?p=26
-		jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113	
-		postman学习 https://www.bilibili.com/video/BV11K4y1J7sh?spm_id_from=333.337.search-card.all.click
-		jmeter学习 https://www.bilibili.com/video/BV1hq4y1K75i?spm_id_from=333.337.search-card.all.click
-		spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
-		spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
-						https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
-		sso单点登录
-		统一认证		
-	以后在学
-		Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver
-		shiro https://www.bilibili.com/video/BV1j54y1t7jM?spm_id_from=333.337.search-card.all.click
-		spring security  https://www.bilibili.com/video/BV15a411A7kP?p=35&spm_id_from=pageDriver
-		Oauth2.0 https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
-		redis 
-		mongodb   https://www.bilibili.com/video/BV1bJ411x7mq?spm_id_from=333.999.0.0
-		memcached 缓存
-		rocketmq  https://www.bilibili.com/video/BV1L4411y7mn?from=search&seid=3090188336145775345&spm_id_from=333.337.0.0
-		atcivemq https://www.bilibili.com/video/BV1vJ41177j1?spm_id_from=333.999.0.0
-		rabbitmq
-		apisix 网关
-		double
-		curator
-		vue
-		postman
-		jndi
-		websocket
-		Zabbix 
-		webflux https://www.bilibili.com/video/av203182483?from=search&seid=8118518497432004823&spm_id_from=333.337.0.0
-		jmeter
-		idea使用git
-		分布式系统遵守的cap原则https://www.ruanyifeng.com/blog/2018/07/cap.html
-		脑裂问题学习 https://www.cnblogs.com/kevingrace/p/12433503.html https://www.cnblogs.com/kevingrace/p/7205846.html
+要学的
+	云原生https://www.bilibili.com/video/BV13Q4y1C7hS?p=82&spm_id_from=pageDriver
 	
+	spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
+	
+	postman学习 https://www.bilibili.com/video/BV11K4y1J7sh?spm_id_from=333.337.search-card.all.click
+	
+	
+	jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113	
+	
+	vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=6
+	
+	
+	spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
+					https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
+	sso单点登录
+	统一认证	
+	idea使用git  https://www.bilibili.com/video/BV1vy4y1s7k6?p=19
+	
+后端相关
+	jmeter学习 https://www.bilibili.com/video/BV1hq4y1K75i?spm_id_from=333.337.search-card.all.click
+	Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver
+	shiro https://www.bilibili.com/video/BV1j54y1t7jM?spm_id_from=333.337.search-card.all.click
+	spring security  https://www.bilibili.com/video/BV15a411A7kP?p=35&spm_id_from=pageDriver
+	Oauth2.0 https://www.bilibili.com/video/BV1Hq4y1W7eo?p=12
+	redis 
+	mongodb   https://www.bilibili.com/video/BV1bJ411x7mq?spm_id_from=333.999.0.0
+	memcached 缓存
+	rocketmq  https://www.bilibili.com/video/BV1L4411y7mn?from=search&seid=3090188336145775345&spm_id_from=333.337.0.0
+	atcivemq https://www.bilibili.com/video/BV1vJ41177j1?spm_id_from=333.999.0.0
+	rabbitmq
+	apisix 网关
+	double
+	curator
+	jndi
+	websocket
+	Zabbix 
+	webflux https://www.bilibili.com/video/av203182483?from=search&seid=8118518497432004823&spm_id_from=333.337.0.0
+	分布式系统遵守的cap原则https://www.ruanyifeng.com/blog/2018/07/cap.html
+	脑裂问题学习 https://www.cnblogs.com/kevingrace/p/12433503.html https://www.cnblogs.com/kevingrace/p/7205846.html	
 运维相关
 	网络 https://www.bilibili.com/video/BV1HY4y1W7e7?p=25&spm_id_from=pageDriver
 	linux  https://www.bilibili.com/video/BV1pz4y1D73n?p=617	
@@ -42,10 +46,8 @@
 
 
 前端相关知识
-	vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=6
 	nodejs https://www.bilibili.com/video/BV1a34y167AZ?spm_id_from=333.999.0.0
 	es6 https://www.bilibili.com/video/BV1uK411H7on?p=8
 	webpack
 	axios
 	elementUI
-			
