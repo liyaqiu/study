@@ -15,7 +15,7 @@
 					https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
 	sso单点登录
 	统一认证	
-	idea使用git  https://www.bilibili.com/video/BV1vy4y1s7k6?p=19
+	idea使用git  https://www.bilibili.com/video/BV1vy4y1s7k6?p=38&spm_id_from=pageDriver
 	
 后端相关
 	jmeter学习 https://www.bilibili.com/video/BV1hq4y1K75i?spm_id_from=333.337.search-card.all.click
