@@ -1,24 +1,67 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 要学的
+
+	postman学习 https://www.bilibili.com/video/BV11K4y1J7sh?p=16
+	jmeter学习 https://www.bilibili.com/video/BV1Aa411h7zm/?spm_id_from=333.788.recommend_more_video.3
+	
 	云原生https://www.bilibili.com/video/BV13Q4y1C7hS?p=82&spm_id_from=pageDriver
-	
 	spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=143   还有后续的原理篇，以及番外篇
-	
-	postman学习 https://www.bilibili.com/video/BV11K4y1J7sh?spm_id_from=333.337.search-card.all.click
-	
-	
 	jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113	
-	
 	vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=6
-	
-	
 	spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
 					https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
 	sso单点登录
 	统一认证	
-	idea使用git  https://www.bilibili.com/video/BV1vy4y1s7k6?p=38&spm_id_from=pageDriver
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 后端相关
-	jmeter学习 https://www.bilibili.com/video/BV1hq4y1K75i?spm_id_from=333.337.search-card.all.click
 	Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver
 	shiro https://www.bilibili.com/video/BV1j54y1t7jM?spm_id_from=333.337.search-card.all.click
 	spring security  https://www.bilibili.com/video/BV15a411A7kP?p=35&spm_id_from=pageDriver
