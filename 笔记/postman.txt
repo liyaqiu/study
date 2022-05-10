@@ -44,3 +44,39 @@ Postman
 					pm.expect(pm.response.responseTime).to.be.below(1000)
 					pm.expect(pm.response.responseTime).below(1000)
 				})
+		基于data来做反例测试(非正常传参)
+			Run collection->data->csv
+				dataname,dataage,expect
+				liyaqiu,31,liyaqiu
+				,31,31
+				liyaqiu,,liyaqiu
+			
+			
+	newman来执行postman到处的json文件
+		https://blog.csdn.net/itfootball/article/details/50570240
+			
+	jenkins+newman		
+		https://zhuanlan.zhihu.com/p/377592148	
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
