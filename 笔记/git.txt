@@ -99,7 +99,7 @@ git
 		git pull ori master 从远程库拉取到本地库
 
 
-	忽略文件名 .gitignore
+	忽略文件名 .gitignore，以下所有匹配都是目录和分件，也就是说不git不分文件和目录
 		# Compiled class file
 		*.class
 

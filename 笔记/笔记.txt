@@ -1,13 +1,23 @@
+﻿
+https://xiaomirom.com/rom/redmi-k30-ultra-cezanne-china-fastboot-recovery-rom/#%E4%B8%8B%E8%BD%BD-%E7%BA%A2%E7%B1%B3-k30-%E8%87%B3%E5%B0%8A%E7%BA%AA%E5%BF%B5%E7%89%88-%E7%A8%B3%E5%AE%9A%E7%89%88-fastboot-%E7%BA%BF%E5%88%B7%E5%8C%85
 
+https://twrp.me/
 
 
 要学的
 
-	spring boot  https://www.bilibili.com/video/BV15b4y1a7yG?p=145  还有后续的原理篇，以及番外篇
-	jvm  https://www.bilibili.com/video/BV1PJ411n7xZ?p=113	
+
+	jvm https://www.bilibili.com/video/BV1PJ411n7xZ?p=375&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	
+	
+	
 	vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=6
+	
 	spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
-					https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
+		          https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
+				  
+				  
+				  
 	sso单点登录
 	统一认证	
 	
@@ -42,8 +52,26 @@
 	云原生 https://www.bilibili.com/video/BV13Q4y1C7hS?p=82&spm_id_from=pageDriver
 
 前端相关知识
-	nodejs https://www.bilibili.com/video/BV1a34y167AZ?spm_id_from=333.999.0.0
+
+	js高级 https://www.bilibili.com/video/BV14s411E7qf?spm_id_from=333.999.0.0
+	
 	es6 https://www.bilibili.com/video/BV1uK411H7on?p=8
-	webpack
-	axios
+	nodejs https://www.bilibili.com/video/BV1a34y167AZ?spm_id_from=333.999.0.0
+	webpack https://www.bilibili.com/video/BV1e7411j7T5?spm_id_from=333.999.0.0
+	
+	Promise https://www.bilibili.com/video/BV1GA411x7z1?spm_id_from=333.999.0.0
+	ajax https://www.bilibili.com/video/BV1WC4y1b78y?spm_id_from=333.999.0.0
+	axios https://www.bilibili.com/video/BV1NJ41197u6?spm_id_from=333.999.0.0
+	less https://www.bilibili.com/video/BV1YW411T7vd?spm_id_from=333.999.0.0
+	
+	React https://www.bilibili.com/video/BV1wy4y1D7JT?spm_id_from=333.999.0.0
+	angular https://www.bilibili.com/video/BV1ts411E7qg?spm_id_from=333.999.0.0
+	
+	Bootstrap https://www.bilibili.com/video/BV1YW411T7yy?spm_id_from=333.999.0.0
+
+	
+	
 	elementUI
+	
+
+	

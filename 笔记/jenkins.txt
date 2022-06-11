@@ -41,13 +41,15 @@ newnode3 k8s-node2
 		systemctl enable postfix && systemctl start postfix
 	下载gitlab rpm包
 		wget https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el6/gitlab-ce-12.4.2-ce.0.el6.x86_64.rpm --no-check-certificate
+	安装gitlab 
 		rpm -ivh gitlab-ce-12.4.2-ce.0.el6.x86_64.rpm 
 	修改配置
 		vi /etc/gitlab/gitlab.rb
 		external_url 'http://192.168.88.15:4567'
 		nginx['listen_port'] = 4567
-		gitlab-ctl reconfigure
-		gitlab-ctl restart
+	gitlab命令
+		gitlab-ctl reconfigure  重新加载配置
+		gitlab-ctl restart 重启
 	访问
 		http://192.168.88.15:4567
 	账户

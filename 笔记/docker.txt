@@ -30,8 +30,7 @@ docker安装
 				取:{20.10.9}-
 			yum -y install docker-ce-19.03.3 docker-ce-cli-19.03.3 containerd.io
         启动
-			systemctl enable docker.service
-			systemctl start docker
+			systemctl enable docker.service && systemctl start docker
         添加阿里云加速器和k8s的推荐使用的cgroup(docker info查看，默认使用 Cgroup Driver: cgroupfs)			
 			mkdir -p /etc/docker
 			tee /etc/docker/daemon.json <<-'EOF'
