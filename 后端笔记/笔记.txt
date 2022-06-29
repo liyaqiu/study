@@ -6,12 +6,12 @@ https://twrp.me/
 
 要学的
 
-
-	jvm https://www.bilibili.com/video/BV1PJ411n7xZ?p=375&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	js基础 https://www.bilibili.com/video/BV1p4411u7TT?p=181&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	es6 https://www.bilibili.com/video/BV1uK411H7on?p=8
 	
+	ajax https://www.bilibili.com/video/BV1WC4y1b78y?spm_id_from=333.999.0.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 	
-	
-	vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=6
+	vue https://www.bilibili.com/video/BV1Zy4y1K7SH?p=59&spm_id_from=pageDriver&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 	
 	spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
 		          https://www.bilibili.com/video/BV1dQ4y1A75e?p=264
@@ -53,9 +53,9 @@ https://twrp.me/
 
 前端相关知识
 
-	js高级 https://www.bilibili.com/video/BV14s411E7qf?spm_id_from=333.999.0.0
 	
-	es6 https://www.bilibili.com/video/BV1uK411H7on?p=8
+	
+	
 	nodejs https://www.bilibili.com/video/BV1a34y167AZ?spm_id_from=333.999.0.0
 	webpack https://www.bilibili.com/video/BV1e7411j7T5?spm_id_from=333.999.0.0
 	
