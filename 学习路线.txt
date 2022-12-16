@@ -3,16 +3,11 @@ https://xiaomirom.com/rom/redmi-k30-ultra-cezanne-china-fastboot-recovery-rom/#%
 
 https://twrp.me/
 
-
-要学的
-
-	webpack https://www.bilibili.com/video/BV14T4y1z7sw?p=71&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
-	
-	spring系统实践	 https://www.bilibili.com/video/BV1np4y1C7Yf?p=3&vd_source=cc17fab1d456bc3958dcb51e2fdd520b   104小时
 	
 	
 	
 后端相关
+	
 	Spring Data https://www.bilibili.com/video/BV1RE41167Pk?p=7&spm_id_from=pageDriver
 	shiro https://www.bilibili.com/video/BV1j54y1t7jM?spm_id_from=333.337.search-card.all.click
 	spring security  https://www.bilibili.com/video/BV15a411A7kP?p=35&spm_id_from=pageDriver
@@ -35,8 +30,12 @@ https://twrp.me/
 	分布式系统遵守的cap原则https://www.ruanyifeng.com/blog/2018/07/cap.html
 	脑裂问题学习 https://www.cnblogs.com/kevingrace/p/12433503.html https://www.cnblogs.com/kevingrace/p/7205846.html	
 	mycat2 https://www.bilibili.com/video/BV1iT41157JX?spm_id_from=333.999.0.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	Sharding Sphere https://www.bilibili.com/video/BV1LK411s7RX?spm_id_from=333.337.search-card.all.click&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	
 	gradle https://www.bilibili.com/video/BV1yT41137Y7?spm_id_from=333.999.0.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 	spring系统实践  https://www.bilibili.com/video/BV1tw411f79E 
+	未结束的课程 https://www.bilibili.com/video/BV1dQ4y1A75e?p=278&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	权限系统 https://www.bilibili.com/video/BV1tw411f79E/?spm_id_from=333.788.recommend_more_video.3&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 运维相关
 	网络 https://www.bilibili.com/video/BV1HY4y1W7e7?p=25&spm_id_from=pageDriver
 	linux  https://www.bilibili.com/video/BV1pz4y1D73n?p=617	
@@ -46,10 +45,16 @@ https://twrp.me/
 
 前端相关知识
 
-	vue实战 https://www.bilibili.com/video/BV1Lp411d7w4?spm_id_from=333.999.0.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
-			https://www.bilibili.com/video/BV1Vf4y1T7bw?spm_id_from=333.999.0.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+	uniapp https://www.bilibili.com/video/BV1Ar4y1s7U5?p=4&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+
+	nuxt 服务端渲染 https://www.bilibili.com/video/BV13Z4y1T74J?spm_id_from=333.337.search-card.all.click&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+
+	vue实战移动端 https://www.bilibili.com/video/BV1Lp411d7w4?spm_id_from=333.999.0.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b    18
+			
 	微信小程序	https://space.bilibili.com/302417610/search/video?keyword=%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F
 	vue3 https://www.bilibili.com/video/BV1Zy4y1K7SH?p=136&spm_id_from=pageDriver&vd_source=cc17fab1d456bc3958dcb51e2fdd520b 有空在学
+	
+	Vue3 + vite + Ts + pinia https://www.bilibili.com/video/BV1dS4y1y7vd/?spm_id_from=333.788.recommend_more_video.2&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 	
 	
 	webpack高级 https://www.bilibili.com/video/BV1cv411C74F/?spm_id_from=333.788.recommend_more_video.0&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
@@ -65,5 +70,7 @@ https://twrp.me/
 数据结构算法
 	https://www.bilibili.com/video/BV13g41157hK?p=6&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 
-
+外挂
+https://www.bilibili.com/video/BV1et411b73Z?p=2&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
+https://www.bilibili.com/video/BV1By4y1r7Cq?p=161&vd_source=cc17fab1d456bc3958dcb51e2fdd520b
 	

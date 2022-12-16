@@ -150,6 +150,10 @@ docker安装
 		docker cp 38cb4ef91f5e:/dir  localdir	拷贝容器目录到本地
 		docker cp 38cb4ef91f5e:/file localfile 拷贝容器文件到本地
 		
+		
+		docker update ba6acccedd29 --restart=always 更新容易的某个参数
+		
+		
 		端口映射
 			docker run --name testName -d -P nginx:v3  结合EXPOSE 8080 8081 8082   随机端口:8080 随机端口:8081 随机端口:8082
 			docker run --name testName -d -p 8080:80 -p 8081:81 -p 8082:82  nginx:v3  
@@ -504,8 +508,11 @@ networks: #声明网络（默认为bridge模式）
 				docker login -u eric -p Eric123456 192.168.88.12:86
 				docker logout 192.168.88.12:86
 mysql安装
-	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql/conf.d -v mysqllog:/var/logs/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	
-	查看字符集 show variables like '%char%';  在my.cnf设置utf8字符集
+	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql -v mysqllog:/var/log/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	数据卷
+
+	docker run -p 3306:3306 --name mysql -v /root/mysql/conf:/etc/mysql -v /root/mysql/log:/var/log/mysql -v /root/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25  本地咯木
+
+	在/root/mysql/conf目录下创建my.cnf
 		[mysql]
 		default-character-set = utf8
 
@@ -521,15 +528,19 @@ mysql安装
 		[mysqld]
 		character_set_server=utf8
 		init_connect=’SET NAMES utf8’
+	查看字符集
+		show variables like '%char%';  
 	
 redis安装
 	下载默认wget http://download.redis.io/redis-stable/redis.conf 配置文件
-	cp redis.conf /root/redis/conf/
-	docker run -it -p 6379:6379 --name redis-server -v /root/redis/conf/redis.conf:/etc/redis/redis.conf  -v /root/redis/data:/data  redis redis-server /etc/redis/redis.conf 
-	docker run  -d -p 6379:6379 --name redis-server -v /root/redis/conf/redis.conf:/etc/redis/redis.conf  -v /root/redis/data:/data  redis redis-server /etc/redis/redis.conf 
+	提前准备好配置文件
+		mkdir -p /root/redis/conf/ && cd /root/redis/conf/ && touch redis.conf
+	运行
+		docker run  -d -p 6379:6379 --name redis-server -v /root/redis/conf/redis.conf:/etc/redis/redis.conf  -v /root/redis/data:/data  redis:6.2 redis-server /etc/redis/redis.conf 
 	
+	运行redis客户端
+		docker exec -it redis-server redis-cli
 	
-
 	
 redis分片集群安装
 	启动集群节点	
