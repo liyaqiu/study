@@ -508,26 +508,30 @@ networks: #声明网络（默认为bridge模式）
 				docker login -u eric -p Eric123456 192.168.88.12:86
 				docker logout 192.168.88.12:86
 mysql安装
+
+	
 	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql -v mysqllog:/var/log/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	数据卷
 
-	docker run -p 3306:3306 --name mysql -v /root/mysql/conf:/etc/mysql -v /root/mysql/log:/var/log/mysql -v /root/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25  本地咯木
+	docker run -p 3306:3306 --name mysql -v /root/mysql/conf:/etc/mysql -v /root/mysql/log:/var/log/mysql -v /root/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25  本地数据卷
 
+	docker run -p 3307:3306 --name mysql8 -e MYSQL_ROOT_PASSWORD=123456  --privileged=true  -d  mysql:8.0.31
+	
 	在/root/mysql/conf目录下创建my.cnf
 		[mysql]
-		default-character-set = utf8
+		default-character-set = utf8mb4
 
 		[mysql.server]
-		default-character-set = utf8
+		default-character-set = utf8mb4
 
 		[mysqld_safe]
-		default-character-set = utf8
+		default-character-set = utf8mb4
 
 		[client]
-		default-character-set = utf8
+		default-character-set = utf8mb4
 
 		[mysqld]
-		character_set_server=utf8
-		init_connect=’SET NAMES utf8’
+		character_set_server=utf8mb4
+		init_connect=’SET NAMES utf8mb4’
 	查看字符集
 		show variables like '%char%';  
 	
