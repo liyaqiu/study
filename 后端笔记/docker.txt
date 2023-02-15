@@ -507,12 +507,40 @@ networks: #声明网络（默认为bridge模式）
 			登录第三方仓库	
 				docker login -u eric -p Eric123456 192.168.88.12:86
 				docker logout 192.168.88.12:86
-mysql安装
+		
+mysql改版后的安装		
+	创建目录
+		mkdir -p /root/mysql/conf  && mkdir -p /root/mysql/data
+	修改配置
+		vi /root/mysql/conf/my.cnf
+		[mysql]
+		default-character-set = utf8mb4
 
+		[mysql.server]
+		default-character-set = utf8mb4
+
+		[mysqld_safe]
+		default-character-set = utf8mb4
+
+		[client]
+		default-character-set = utf8mb4
+
+		[mysqld]
+		character_set_server=utf8mb4
+		init_connect=’SET NAMES utf8mb4’
+
+		!includedir /etc/mysql/conf.d/
+		!includedir /etc/mysql/mysql.conf.d/
+
+	启动
+		docker run -p 3306:3306 --name mysql5.7.25 -v /root/mysql/conf/my.cnf:/etc/mysql/my.cnf -v /root/mysql/data:/var/lib/mysql   -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25
+	查看字符集
+		show variables like '%char%';  							
+mysql安装
 	
 	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql -v mysqllog:/var/log/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	数据卷
 
-	docker run -p 3306:3306 --name mysql -v /root/mysql/conf:/etc/mysql -v /root/mysql/log:/var/log/mysql -v /root/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25  本地数据卷
+	docker run -p 3306:3306 --name mysql -v /root/mysql/conf/my.cnf:/etc/mysql/my.cnf  -v /root/mysql/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25  本地数据卷
 
 	docker run -p 3307:3306 --name mysql8 -e MYSQL_ROOT_PASSWORD=123456  --privileged=true  -d  mysql:8.0.31
 	
@@ -532,6 +560,9 @@ mysql安装
 		[mysqld]
 		character_set_server=utf8mb4
 		init_connect=’SET NAMES utf8mb4’
+		
+		!includedir /etc/mysql/conf.d/
+		!includedir /etc/mysql/mysql.conf.d/
 	查看字符集
 		show variables like '%char%';  
 	
