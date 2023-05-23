@@ -527,7 +527,6 @@ mysql改版后的安装
 
 		[mysqld]
 		character_set_server=utf8mb4
-		init_connect=’SET NAMES utf8mb4’
 
 		!includedir /etc/mysql/conf.d/
 		!includedir /etc/mysql/mysql.conf.d/
