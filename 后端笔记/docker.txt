@@ -509,32 +509,57 @@ networks: #声明网络（默认为bridge模式）
 				docker logout 192.168.88.12:86
 		
 mysql改版后的安装		
-	创建目录
-		mkdir -p /root/mysql/conf  && mkdir -p /root/mysql/data
-	修改配置
-		vi /root/mysql/conf/my.cnf
-		[mysql]
-		default-character-set = utf8mb4
+	5.7安装
+		创建目录
+			mkdir -p /root/mysql5.7/conf  && mkdir -p /root/mysql5.7/data
+		修改配置
+			vi /root/mysql5.7/conf/my.cnf
+			[mysql]
+			default-character-set = utf8mb4
 
-		[mysql.server]
-		default-character-set = utf8mb4
+			[mysql.server]
+			default-character-set = utf8mb4
 
-		[mysqld_safe]
-		default-character-set = utf8mb4
+			[mysqld_safe]
+			default-character-set = utf8mb4
 
-		[client]
-		default-character-set = utf8mb4
+			[client]
+			default-character-set = utf8mb4
 
-		[mysqld]
-		character_set_server=utf8mb4
+			[mysqld]
+			character_set_server=utf8mb4
 
-		!includedir /etc/mysql/conf.d/
-		!includedir /etc/mysql/mysql.conf.d/
+			!includedir /etc/mysql/conf.d/
+			!includedir /etc/mysql/mysql.conf.d/
 
-	启动
-		docker run -p 3306:3306 --name mysql5.7.25 -v /root/mysql/conf/my.cnf:/etc/mysql/my.cnf -v /root/mysql/data:/var/lib/mysql   -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25
-	查看字符集
-		show variables like '%char%';  							
+		启动
+			docker run -p 3306:3306 --name mysql5.7.25 -v /root/mysql5.7/conf/my.cnf:/etc/mysql/my.cnf -v /root/mysql5.7/data:/var/lib/mysql   -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25
+		查看字符集
+			show variables like '%char%';  			
+	8.0安装
+		创建目录
+			mkdir -p /root/mysql8.0/conf  && mkdir -p /root/mysql8.0/data
+		修改配置
+			vi /root/mysql8.0/conf/my.cnf
+			[mysql]
+			default-character-set = utf8mb4
+
+			[mysql.server]
+			default-character-set = utf8mb4
+
+			[mysqld_safe]
+			default-character-set = utf8mb4
+
+			[client]
+			default-character-set = utf8mb4
+
+			[mysqld]
+			character_set_server=utf8mb4
+
+		启动
+			docker run -p 3307:3306 --name mysql8.1.0 -v /root/mysql8.0/conf/my.cnf:/etc/mysql/my.cnf -v /root/mysql8.0/data:/var/lib/mysql   -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:8.1.0
+		查看字符集
+			show variables like '%char%';  		
 mysql安装
 	
 	docker run -p 3306:3306 --name mysql -v mysqlconf:/etc/mysql -v mysqllog:/var/log/mysql -v mysqldata:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 --privileged=true -d mysql:5.7.25	数据卷
