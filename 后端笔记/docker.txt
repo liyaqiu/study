@@ -591,9 +591,8 @@ mysql安装
 		show variables like '%char%';  
 	
 redis安装
-	下载默认wget http://download.redis.io/redis-stable/redis.conf 配置文件
-	提前准备好配置文件
-		mkdir -p /root/redis/conf/ && cd /root/redis/conf/ && touch redis.conf
+	下载默认配置文件
+		wget http://download.redis.io/redis-stable/redis.conf  && mkdir -p /root/redis/conf && mkdir -p /root/redis/data && mv redis.conf /root/redis/conf
 	运行
 		docker run  -d -p 6379:6379 --name redis-server -v /root/redis/conf/redis.conf:/etc/redis/redis.conf  -v /root/redis/data:/data  redis:6.2 redis-server /etc/redis/redis.conf 
 	
